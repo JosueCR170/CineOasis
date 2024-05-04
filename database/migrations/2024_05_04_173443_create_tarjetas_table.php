@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('numero');
             $table->date('fechaVencimiento');
-            $table->integer('codigo');
+            $table->string('codigo', 3);
             $table->timestamps();
 
             //Llave foránea que se relaciona al usuario
