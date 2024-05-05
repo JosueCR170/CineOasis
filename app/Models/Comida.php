@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Comida extends Model
 {
     use HasFactory;
+    protected $table='comida';
+    
+    
+    public function detallesCombo(){
+        return $this->hasMany(DetallesCombo::class, 'idComida');
+    }
 }

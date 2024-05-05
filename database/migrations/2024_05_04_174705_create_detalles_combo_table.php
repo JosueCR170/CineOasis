@@ -13,6 +13,20 @@ return new class extends Migration
     {
         Schema::create('detalles_combo', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('idTicket')
+            ->constrained('tickets')
+            ->nullable()
+            ->cascadeOnUpdate()
+            ->cascadeOnDelete();
+            $table->foreignId('idComida')
+            ->constrained('comida')
+            ->nullable()
+            ->cascadeOnUpdate()
+            ->cascadeOnDelete();
+            $table->integer('cantidad');
+            $table->float('subtotal');
+            $table->float('descuento')->nullable();
+            $table->float('impuesto')->nullable();
             $table->timestamps();
         });
     }
