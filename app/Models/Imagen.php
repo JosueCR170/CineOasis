@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Imagen extends Model
 {
     use HasFactory;
+    public function peliculas(){
+        
+        return $this->belongsTo(Pelicula::class,'idPelicula');
+    }
 }
