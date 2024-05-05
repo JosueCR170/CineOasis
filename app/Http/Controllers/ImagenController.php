@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Imagen;
 
-class UserController extends Controller
+class ImagenController extends Controller
 {
+    //
     public function index()
     {
-        $data=User::all();
-        $data=$data->load('tarjetas');
+        $data=Imagen::all();
         $response=array(
             "status"=>200,
             "message"=>"Todos los registros de la categoria",

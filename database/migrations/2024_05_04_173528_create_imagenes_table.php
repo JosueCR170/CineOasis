@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('imagenes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('idPelicula')
+            ->nullable()
+            ->constrained('peliculas')
+            ->cascadeOnUpdate()
+            ->nullOnDelete();
+            $table->binary('imagen');
+            $table->string('descripcion',55);
            
         });
     }
