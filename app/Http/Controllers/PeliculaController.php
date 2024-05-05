@@ -9,6 +9,9 @@ use Illuminate\Validation\Rule;
 
 class PeliculaController extends Controller
 {
+
+ 
+
     public function index()
     {
         $data=Pelicula::all();
@@ -28,19 +31,26 @@ class PeliculaController extends Controller
         if($data_input){
             $data = json_decode($data_input,true);
             $data=array_map('trim',$data);
-            $rules=[
-                'nombre'=>'required|string|max:40',
-                'descripcion'=>'required',
-                'duracion'=>'required',
-                'idioma'=>'required',Rule::in(['Español','Ingles','Frances','Portugues','Japones']),
-                'subtitulo'=>'required',Rule::in(['Español','Ingles','Frances','Portugues','Japones','No Posee']),
-                'genero'=>'required|max:20',
-                'fechaEstreno'=>'required|date',
-                'calificacionEdad'=>'required',Rule::in(['G','PG','PG-13','R','NC-17']),
-                'animacion'=>'required',Rule::in(['2D','3D','Stop-Motion']),
-                'director'=>'required|max:70',
-                'elenco'=>'required|max:160',
+
+            $idiomas = Pelicula::getIdiomas();
+            $subtitulos = Pelicula::getSubtitulos();
+            $clasificacion = Pelicula::getClasificacion();
+            $animacion = Pelicula::getAnimacion();
+
+            $rules = [
+                'nombre' => 'required|string|max:40',
+                'descripcion' => 'required',
+                'duracion' => 'required|date_format:H:i:s',
+                'idioma' => ['required', Rule::in($idiomas)],
+                'subtitulo' => ['required', Rule::in($subtitulos)],
+                'genero' => 'required|max:20',
+                'fechaEstreno' => 'required|date',
+                'calificacionEdad' => ['required', Rule::in(array_keys($clasificacion))],
+                'animacion' => ['required', Rule::in($animacion)],
+                'director' => 'required|max:70',
+                'elenco' => 'required|max:160',
             ];
+            
             $isValid =\validator($data,$rules);
             if(!$isValid->fails()){
                 $pelicula = new Pelicula();
@@ -127,7 +137,7 @@ class PeliculaController extends Controller
         if (!$pelicula) {
             $response = [
                 'status' => 404,
-                'message' => 'Usuario no encontrado'
+                'message' => 'Pelicula no encontrada'
             ];
             return response()->json($response, $response['status']);
         }
@@ -143,17 +153,22 @@ class PeliculaController extends Controller
             return response()->json($response, $response['status']);
         }
     
+        $idiomas = Pelicula::getIdiomas();
+        $subtitulos = Pelicula::getSubtitulos();
+        $clasificacion = Pelicula::getClasificacion();
+        $animacion = Pelicula::getAnimacion();
+
         $rules = [
-            'nombre' => 'alpha',
-            'descripcion' => 'alpha',
-            'idioma' => 'alpha',
-            'subtitulo' => 'alpha',
-            'genero' => 'alpha',
+            'nombre' => 'string|max:40',
+            'duracion' => 'date_format:H:i:s',
+            'idioma' =>  Rule::in($idiomas),
+            'subtitulo' => Rule::in($subtitulos),
+            'genero' => 'max:20',
             'fechaEstreno' => 'date',
-            'calificacionEdad' => 'numeric',
-            'calidad' => 'alpha_num',
-            'director' => 'alpha',
-            'elenco' => 'alpha',
+            'calificacionEdad' => Rule::in(array_keys($clasificacion)),
+            'animacion' => Rule::in($animacion),
+            'director' => 'max:70',
+            'elenco' => 'max:160',
         ];
     
         $validator = \validator($data_input, $rules);
@@ -174,7 +189,7 @@ class PeliculaController extends Controller
         if(isset($data_input['genero'])) { $pelicula->genero = $data_input['genero']; }
         if(isset($data_input['fechaEstreno'])) { $pelicula->fechaEstreno = $data_input['fechaEstreno']; }
         if(isset($data_input['calificacionEdad'])) { $pelicula->calificacionEdad = $data_input['calificacionEdad']; }
-        if(isset($data_input['calidad'])) { $pelicula->calidad = $data_input['calidad']; }
+        if(isset($data_input['animacion'])) { $pelicula->animacion = $data_input['animacion']; }
         if(isset($data_input['director'])) { $pelicula->director = $data_input['director']; }
         if(isset($data_input['elenco'])) { $pelicula->fechaEstreno = $data_input['elenco']; }
 
@@ -182,7 +197,7 @@ class PeliculaController extends Controller
     
         $response = [
             'status' => 201,
-            'message' => 'Pelicula actualizado',
+            'message' => 'Pelicula actualizada',
             'Pelicula' => $pelicula
         ];
     

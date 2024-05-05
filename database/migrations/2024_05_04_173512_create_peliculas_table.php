@@ -16,12 +16,12 @@ return new class extends Migration
             $table->string('nombre', 40);
             $table->text('descripcion');
             $table->time('duracion');
-            $table->enum('idioma', ['Español','Ingles','Frances','Portugues','Japones']);
-            $table->enum('subtitulo',['Español','Ingles','Frances','Portugues','Japones','No Posee']);
+            $table->string('idioma');
+            $table->string('subtitulo');
             $table->string('genero',20);
             $table->date('fechaEstreno');
-            $table->enum('calificacionEdad',['G','PG','PG-13','R','NC-17']);
-            $table->enum('animacion',['2D','3D','Stop-Motion']);
+            $table->string('calificacionEdad');
+            $table->string('animacion');
             $table->string('director', 70);
             $table->string('elenco', 160);
 
