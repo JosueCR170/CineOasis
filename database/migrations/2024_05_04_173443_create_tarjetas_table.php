@@ -13,17 +13,19 @@ return new class extends Migration
     {
         Schema::create('tarjetas', function (Blueprint $table) {
             $table->id();
-            $table->integer('numero');
+             //Llave foránea que se relaciona al usuario
+             $table->foreignId('idUsuario')
+             ->constrained('users')
+             ->nullable()
+             ->cascadeOnUpdate()
+             ->cascadeOnDelete();
+
+            $table->string('numero',25);
             $table->date('fechaVencimiento');
-            $table->string('codigo', 3);
+            $table->integer('codigo');
             $table->timestamps();
 
-            //Llave foránea que se relaciona al usuario
-            $table->foreignId('idUsuario')
-            ->nullable()
-            ->constrained('users')
-            ->cascadeOnUpdate()
-            ->nullOnDelete();
+           
         });
     }
 
