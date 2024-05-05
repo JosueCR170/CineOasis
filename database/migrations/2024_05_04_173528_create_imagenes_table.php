@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('imagenes', function (Blueprint $table) {
+        Schema::create('imagens', function (Blueprint $table) {
             $table->id();
             $table->foreignId('idPelicula')
             ->nullable()
             ->constrained('peliculas')
             ->cascadeOnUpdate()
-            ->nullOnDelete();
+            ->cascadeOnDelete();
             $table->binary('imagen');
             $table->string('descripcion',55);
            

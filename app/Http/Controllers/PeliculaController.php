@@ -10,10 +10,10 @@ class PeliculaController extends Controller
     public function index()
     {
         $data=Pelicula::all();
-       $data=$data->load('imagenes');
+        $data=$data->load('imagenes');
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de la categoria",
+            "menssage"=>"Todos los registros de la categoria",
             "data"=>$data
         );
         return response()->json($response,200);
@@ -31,10 +31,10 @@ class PeliculaController extends Controller
                 'descripcion'=>'required',
                 'duracion'=>'required',
                 'idioma'=>'required',
-                'subtitulos'=>'required',
+                'subtitulo'=>'required',
                 'genero'=>'required',
                 'fechaEstreno'=>'required',
-                'calificacion'=>'nullable',
+                'calificacionEdad'=>'nullable',
                 'calidad'=>'nullable',
                 'director'=>'nullable',
                 'elenco'=>'nullable',
@@ -48,16 +48,17 @@ class PeliculaController extends Controller
                 $pelicula->descripcion=$data['descripcion'];
                 $pelicula->duracion=$data['duracion'];
                 $pelicula->idioma=$data['idioma'];
-                $pelicula->subtitulos=$data['subtitulos'];
+                $pelicula->subtitulo=$data['subtitulo'];
+                $pelicula->genero=$data['genero'];
                 $pelicula->fechaEstreno=$data['fechaEstreno'];
-                $pelicula->calificacion=$data['calificacion'];
+                $pelicula->calificacionEdad=$data['calificacionEdad'];
                 $pelicula->director=$data['director'];
                 $pelicula->elenco=$data['elenco'];
                 $pelicula->save();
-                $pelicula = array(
+                $response = array(
                     'status'=>201,
                     'menssage'=>'pelicula creada',
-                    'category'=>$pelicula
+                    'pelicula'=>$pelicula
                 );
             }else{
                 $response = array(
@@ -78,7 +79,7 @@ class PeliculaController extends Controller
         public function show($id){
             $data=Pelicula::find($id);
             if(is_object($data)){
-                $data->load('imagenes');
+                $data=$data->load('imagenes');
                 $response=array(
                 'status'=>200,
                 'menssage'=>'pelicula encontrada',
@@ -118,5 +119,70 @@ class PeliculaController extends Controller
             }
             return response()->json($response,$response['status']);
         }
+
+        //patch
+    public function update(Request $request, $id) {
+        $user = User::find($id);
+    
+        if (!$user) {
+            $response = [
+                'status' => 404,
+                'message' => 'Usuario no encontrado'
+            ];
+            return response()->json($response, $response['status']);
+        }
+    
+        $data_input = $request->input('data', null);
+        $data_input = json_decode($data_input, true);
+    
+        if (!$data_input) {
+            $response = [
+                'status' => 400,
+                'message' => 'No se encontró el objeto data. No hay datos que modificar'
+            ];
+            return response()->json($response, $response['status']);
+        }
+    
+        $rules = [
+            'nombre' => 'alpha',
+            'descripcion' => 'alpha',
+            'idioma' => 'alpha',
+            'subtitulo' => 'alpha',
+            'genero' => 'alpha',
+            'fechaEstreno' => 'date',
+            'calificacionEdad' => 'numeric',
+            'calidad' => 'alpha_num',
+            'director' => 'alpha',
+            'elenco' => 'alpha',
+        ];
+    
+        $validator = \validator($data_input, $rules);
+    
+        if ($validator->fails()) {
+            $response = [
+                'status' => 406,
+                'message' => 'Datos inválidos',
+                'error' => $validator->errors()
+            ];
+            return response()->json($response, $response['status']);
+        }
+    
+        if(isset($data_input['name'])) { $user->name = $data_input['name']; }
+        if(isset($data_input['apellido'])) { $user->apellido = $data_input['apellido']; }
+        if(isset($data_input['email'])) { $user->email = $data_input['email']; }
+        if(isset($data_input['password'])) { $user->password = $data_input['password']; }
+        if(isset($data_input['fechaNacimiento'])) { $user->fechaNacimiento = $data_input['fechaNacimiento']; }
+        if(isset($data_input['permisoAdmin'])) { $user->permisoAdmin = $data_input['permisoAdmin']; }
+
+        $user->save();
+    
+        $response = [
+            'status' => 201,
+            'message' => 'Usuario actualizado',
+            'user' => $user
+        ];
+    
+        return response()->json($response, $response['status']);
+    }
     
 }
