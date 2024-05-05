@@ -17,10 +17,10 @@ return new class extends Migration
             ->nullable()
             ->constrained('peliculas')
             ->cascadeOnUpdate()
-            ->cascadeOnDelete();
-            $table->binary('imagen');
-            $table->string('descripcion',55);
-           
+            ->cascadeOnDelete()->nullable();
+            $table->binary('imagen')->nullable();
+            $table->string('descripcion',55)->nullable();
+            $table->timestamps();
         });
     }
 

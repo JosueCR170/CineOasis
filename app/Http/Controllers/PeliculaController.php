@@ -122,9 +122,8 @@ class PeliculaController extends Controller
 
         //patch
     public function update(Request $request, $id) {
-        $user = User::find($id);
-    
-        if (!$user) {
+        $pelicula = Pelicula::find($id);
+        if (!$pelicula) {
             $response = [
                 'status' => 404,
                 'message' => 'Usuario no encontrado'
@@ -167,19 +166,23 @@ class PeliculaController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        if(isset($data_input['name'])) { $user->name = $data_input['name']; }
-        if(isset($data_input['apellido'])) { $user->apellido = $data_input['apellido']; }
-        if(isset($data_input['email'])) { $user->email = $data_input['email']; }
-        if(isset($data_input['password'])) { $user->password = $data_input['password']; }
-        if(isset($data_input['fechaNacimiento'])) { $user->fechaNacimiento = $data_input['fechaNacimiento']; }
-        if(isset($data_input['permisoAdmin'])) { $user->permisoAdmin = $data_input['permisoAdmin']; }
+        if(isset($data_input['nombre'])) { $pelicula->nombre = $data_input['nombre']; }
+        if(isset($data_input['descripcion'])) { $pelicula->descripcion = $data_input['descripcion']; }
+        if(isset($data_input['idioma'])) { $pelicula->idioma = $data_input['idioma']; }
+        if(isset($data_input['subtitulo'])) { $pelicula->subtitulo = $data_input['subtitulo']; }
+        if(isset($data_input['genero'])) { $pelicula->genero = $data_input['genero']; }
+        if(isset($data_input['fechaEstreno'])) { $pelicula->fechaEstreno = $data_input['fechaEstreno']; }
+        if(isset($data_input['calificacionEdad'])) { $pelicula->calificacionEdad = $data_input['calificacionEdad']; }
+        if(isset($data_input['calidad'])) { $pelicula->calidad = $data_input['calidad']; }
+        if(isset($data_input['director'])) { $pelicula->director = $data_input['director']; }
+        if(isset($data_input['elenco'])) { $pelicula->fechaEstreno = $data_input['elenco']; }
 
-        $user->save();
+        $pelicula->save();
     
         $response = [
             'status' => 201,
-            'message' => 'Usuario actualizado',
-            'user' => $user
+            'message' => 'Pelicula actualizado',
+            'Pelicula' => $pelicula
         ];
     
         return response()->json($response, $response['status']);
