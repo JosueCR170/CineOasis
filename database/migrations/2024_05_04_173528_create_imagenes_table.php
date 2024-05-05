@@ -18,11 +18,11 @@ return new class extends Migration
             ->nullable()
             ->cascadeOnUpdate()
             ->cascadeOnDelete();
-
             $table->binary('imagen')->nullable();
             $table->string('descripcion',55)->nullable();
             $table->timestamps();
         });
+        DB::statement('ALTER TABLE imagenes MODIFY imagen MEDIUMBLOB');
     }
 
     /**

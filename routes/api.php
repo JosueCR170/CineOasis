@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TarjetaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PeliculaController;
+use App\Http\Controllers\ImagenController;
+use App\Http\Controllers\ComidaController;
+use App\Http\Controllers\DetallesComboController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -20,6 +23,9 @@ Route::prefix('v1')->group(
         Route::resource('/sala',SalaController::class,['except'=>['create','edit']]);
         Route::resource('/funcion',FuncionController::class,['except'=>['create','edit']]);
         Route::resource('/pelicula',PeliculaController::class,['except'=>['create','edit']]);
+        Route::resource('/imagen',ImagenController::class,['except'=>['create','edit']]);
+        Route::resource('/comida',ComidaController::class,['except'=>['create','edit']]);
+        Route::resource('/combo',DetallesComboController::class,['except'=>['create','edit']]);
 
     }
 );

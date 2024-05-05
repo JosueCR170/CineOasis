@@ -40,6 +40,7 @@ class PeliculaController extends Controller
                 'animacion'=>'required',Rule::in(['2D','3D','Stop-Motion']),
                 'director'=>'required|max:70',
                 'elenco'=>'required|max:160',
+                
             ];
             $isValid =\validator($data,$rules);
             if(!$isValid->fails()){
