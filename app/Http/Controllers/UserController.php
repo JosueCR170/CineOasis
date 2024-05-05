@@ -25,9 +25,9 @@ class UserController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'name'=>'required|alpha',
-                'apellido'=>'required|alpha',
-                'email'=>'required|email',
+                'name'=>'required|alpha|max:30',
+                'apellido'=>'required|alpha|max:40',
+                'email'=>'required|email|unique:users,email',
                 'password'=>'required|alpha_dash',
                 'fechaNacimiento'=>'required|date',
                 'permisoAdmin'=>'required|boolean'
@@ -130,12 +130,12 @@ class UserController extends Controller
         }
     
         $rules = [
-            'name' => 'alpha',
-            'apellido' => 'alpha',
-            'email' => 'email',
-            'password' => 'alpha_dash',
-            'fechaNacimiento' => 'date',
-            'permisoAdmin' => 'boolean'
+            'name'=>'alpha|max:30',
+            'apellido'=>'alpha|max:40',
+            'email'=>'email|unique:users,email',
+            'password'=>'alpha_dash',
+            'fechaNacimiento'=>'date',
+            'permisoAdmin'=>'boolean'
         ];
     
         $validator = \validator($data_input, $rules);

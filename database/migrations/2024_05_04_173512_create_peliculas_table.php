@@ -17,13 +17,13 @@ return new class extends Migration
             $table->text('descripcion');
             $table->time('duracion');
             $table->enum('idioma', ['Español','Ingles','Frances','Portugues','Japones']);
-            $table->enum('subtitulo',['Español','Ingles','Frances','Portugues','Japones']);
-            $table->string('genero',40);
+            $table->enum('subtitulo',['Español','Ingles','Frances','Portugues','Japones','No Posee']);
+            $table->string('genero',20);
             $table->date('fechaEstreno');
-            $table->integer('calificacionEdad');
-            $table->string('calidad')->nullable();
-            $table->string('director', 70)->nullable();
-            $table->string('elenco', 160)->nullable();
+            $table->enum('calificacionEdad',['G','PG','PG-13','R','NC-17']);
+            $table->enum('animacion',['2D','3D','Stop-Motion']);
+            $table->string('director', 70);
+            $table->string('elenco', 160);
 
             $table->timestamps();
         });

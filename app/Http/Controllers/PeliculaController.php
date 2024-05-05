@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pelicula;
+use App\Enums\ServerStatus;
+use Illuminate\Validation\Rule;
 
 class PeliculaController extends Controller
 {
@@ -13,7 +15,7 @@ class PeliculaController extends Controller
         $data=$data->load('imagenes');
         $response=array(
             "status"=>200,
-            "menssage"=>"Todos los registros de la categoria",
+            "menssage"=>"Todos los registros de las peliculas",
             "data"=>$data
         );
         return response()->json($response,200);
@@ -27,19 +29,17 @@ class PeliculaController extends Controller
             $data = json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'nombre'=>'required|alpha',
+                'nombre'=>'required|string|max:40',
                 'descripcion'=>'required',
                 'duracion'=>'required',
-                'idioma'=>'required',
-                'subtitulo'=>'required',
-                'genero'=>'required',
-                'fechaEstreno'=>'required',
-                'calificacionEdad'=>'nullable',
-                'calidad'=>'nullable',
-                'director'=>'nullable',
-                'elenco'=>'nullable',
-                
-
+                'idioma'=>'required',Rule::in(['Español','Ingles','Frances','Portugues','Japones']),
+                'subtitulo'=>'required',Rule::in(['Español','Ingles','Frances','Portugues','Japones','No Posee']),
+                'genero'=>'required|max:20',
+                'fechaEstreno'=>'required|date',
+                'calificacionEdad'=>'required',Rule::in(['G','PG','PG-13','R','NC-17']),
+                'animacion'=>'required',Rule::in(['2D','3D','Stop-Motion']),
+                'director'=>'required|max:70',
+                'elenco'=>'required|max:160',
             ];
             $isValid =\validator($data,$rules);
             if(!$isValid->fails()){
@@ -52,6 +52,7 @@ class PeliculaController extends Controller
                 $pelicula->genero=$data['genero'];
                 $pelicula->fechaEstreno=$data['fechaEstreno'];
                 $pelicula->calificacionEdad=$data['calificacionEdad'];
+                $pelicula->animacion=$data['animacion'];
                 $pelicula->director=$data['director'];
                 $pelicula->elenco=$data['elenco'];
                 $pelicula->save();
@@ -99,7 +100,7 @@ class PeliculaController extends Controller
 
         public function destroy($id){
             if(isset($id)){
-                $delete=Category::where('id',$id)->delete();
+                $delete=Pelicula::where('id',$id)->delete();
                 if($delete){
                     $response=array(
                         'status'=>200,
@@ -108,7 +109,7 @@ class PeliculaController extends Controller
                 }else{
                     $response = array(
                         'status'=>400,
-                        'menssage'=>'No se pudo eliminar la peliculo, compruebe que exista'
+                        'menssage'=>'No se pudo eliminar la pelicula, compruebe que exista'
                     );
                 }
             }else{

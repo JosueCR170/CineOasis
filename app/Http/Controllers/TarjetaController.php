@@ -26,8 +26,8 @@ class TarjetaController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idUsuario'=>'required|numeric',
-                'numero'=>'required|numeric',
+                'idUsuario'=>'required|numeric|exists:users,id',
+                'numero'=>'required|numeric|unique:tarjetas,numero',
                 'fechaVencimiento'=>'required|date',
                 'codigo'=>'required|numeric'
             ];
@@ -126,9 +126,10 @@ class TarjetaController extends Controller
         }
     
         $rules = [
-            'numero'=>'numeric|size:25',
+            'idUsuario'=>'numeric|exists:users,id',
+            'numero'=>'numeric|unique:tarjetas,numero',
             'fechaVencimiento'=>'date',
-            'codigo'=>'numeric|size:5'
+            'codigo'=>'numeric'
         ];
     
         $validator = \validator($data_input, $rules);

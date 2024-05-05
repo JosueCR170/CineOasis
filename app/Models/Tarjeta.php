@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Tarjeta extends Model
 {
     use HasFactory;
-
+    protected $table='tarjetas';
     public function usuarios(){
         return $this->belongsTo(User::class,'idUsuario');
     }
