@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Sala extends Model
 {
     use HasFactory;
+
+    protected $table='salas';
+    protected $fillable=['nombreSala','capacidad'];
+
+    public function asientos(){
+        return $this->hasMany(Asiento::class, 'id');
+    }
 }

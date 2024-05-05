@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Funcion extends Model
 {
     use HasFactory;
+
+    protected $table='funciones';
+    protected $fillable=['fecha','horaInicio','horaFinal', 'precio'];
+
+    public function salas(){
+        return $this->belongsTo(Sala::class,'id');
+    }
+
 }
