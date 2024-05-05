@@ -20,12 +20,10 @@ return new class extends Migration
              ->cascadeOnUpdate()
              ->cascadeOnDelete();
 
-            $table->string('numero',25);
+            $table->string('numero',25)->unique();
             $table->date('fechaVencimiento');
             $table->integer('codigo');
             $table->timestamps();
-
-           
         });
     }
 

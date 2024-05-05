@@ -46,6 +46,6 @@ class User extends Authenticatable
     }
 
     public function tarjetas(){
-        return $this->hasMany(Tarjeta::class, 'id');
+        return $this->hasMany(Tarjeta::class, 'idUsuario');
     }
 }

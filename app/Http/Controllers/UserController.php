@@ -10,10 +10,10 @@ class UserController extends Controller
     public function index()
     {
         $data=User::all();
-        $data=$data->load('tarjetas');
+        $data = User::with('tarjetas')->get();
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de la categoria",
+            "message"=>"Todos los registros de los usuarios",
             "data"=>$data
         );
         return response()->json($response,200);
