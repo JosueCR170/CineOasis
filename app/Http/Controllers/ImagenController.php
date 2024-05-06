@@ -95,9 +95,6 @@ class ImagenController extends Controller
             return response()->json($response,$response['status']);
         }
       
-        
-
-
         public function destroy($id){
             if(isset($id)){
                 $delete=Imagen::where('id',$id)->delete();
@@ -121,6 +118,7 @@ class ImagenController extends Controller
             return response()->json($response,$response['status']);
         }
 
+
     public function update(Request $request, $id) {
         $imagen = Imagen::find($id);
     
@@ -131,20 +129,16 @@ class ImagenController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-    
         $data_input = $request->input('data', null);
         $image_input = $request->file('imagen');
     
         if ($data_input || $image_input) {
             $data = json_decode($data_input, true) ?: [];
             $data = array_map('trim', $data);
-    
             $rules = [
                 'idPelicula' => 'exists:peliculas,id'
             ];
-    
             $isValid = \validator($data, $rules);
-    
             if(!$isValid->fails()) {
                 $imagen->idPelicula = $data['idPelicula']; 
                 $imagen->descripcion = $data['descripcion'];
@@ -156,7 +150,8 @@ class ImagenController extends Controller
                     'message' => 'Imagen actualizada',
                     'imagen' => $imagen
                 ];
-            } else {
+            } 
+            else {
                 $response = [
                     'status' => 406,
                     'message' => 'Datos inválidos',
@@ -169,7 +164,6 @@ class ImagenController extends Controller
                 'message' => 'No se encontraron los datos de la imagen'
             ];
         }
-    
         return response()->json($response, $response['status']);
     }
     
