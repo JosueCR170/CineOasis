@@ -21,7 +21,7 @@ use App\Http\Controllers\DetallesComboController;
 Route::prefix('v1')->group(
     function(){
         //RUTAS ESPECIFICAS
-
+        Route::post('/rellenar',[AsientoController::class,'rellenar']);
         //RUTAS AUTOMATICAS Restful
         Route::post('/user/login',[UserController::class,'login']);
         Route::resource('/tarjeta',TarjetaController::class,['except'=>['create','edit']]);
