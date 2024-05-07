@@ -95,9 +95,6 @@ class ImagenController extends Controller
             return response()->json($response,$response['status']);
         }
       
-        
-
-
         public function destroy($id){
             if(isset($id)){
                 $delete=Imagen::where('id',$id)->delete();
@@ -120,8 +117,6 @@ class ImagenController extends Controller
             }
             return response()->json($response,$response['status']);
         }
-
-
         public function update(Request $request, $id) {
             $imagen = Imagen::find($id);
             
@@ -207,7 +202,5 @@ class ImagenController extends Controller
         
             return response()->json($response, $response['status']);
         }
-        
-        
     
 }

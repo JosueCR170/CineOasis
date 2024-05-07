@@ -13,8 +13,7 @@ class DetallesCombo extends Model
     public function comida(){
         return $this->belongsTo(Comida::class,'idComida');
     }
-
     public function tickets(){
-        return $this->belongsTo(Comida::class,'idTicket');
+        return $this->belongsTo(Ticket::class,'idTicket');
     }
 }
