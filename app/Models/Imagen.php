@@ -9,8 +9,8 @@ class Imagen extends Model
 {
     use HasFactory;
     protected $table = 'imagenes';
+    
     public function peliculas(){
-        
         return $this->belongsTo(Pelicula::class,'idPelicula');
     }
 }

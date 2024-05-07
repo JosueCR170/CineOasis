@@ -9,8 +9,12 @@ class DetallesCombo extends Model
 {
     use HasFactory;
     protected $table = 'detalles_combo';
-    public function peliculas(){
-        
+
+    public function comida(){
         return $this->belongsTo(Comida::class,'idComida');
+    }
+
+    public function tickets(){
+        return $this->belongsTo(Comida::class,'idTicket');
     }
 }

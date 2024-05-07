@@ -13,7 +13,7 @@ class AsientoController extends Controller
         $data=Asiento::all();
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros del asiento",
+            "message"=>"Todos los registros de los asientos",
             "data"=>$data
         );
         return response()->json($response,200);
@@ -25,10 +25,10 @@ class AsientoController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idSala'=>'required',
-                'numero'=>'required|numeric',
-                'fila'=>'required|alpha_num',
-                'estado'=>'required',
+                'idSala'=>'required|exists:salas,id',
+                'numero'=>'required|integer',
+                'fila'=>'required|string',
+                'estado'=>'required|boolean'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
@@ -41,7 +41,7 @@ class AsientoController extends Controller
                 $response=array(
                     'status'=>201,
                     'message'=>'Asiento creado',
-                    'user'=>$asiento
+                    'asiento'=>$asiento
                 );
             }else{
                 $response=array(
@@ -125,10 +125,10 @@ class AsientoController extends Controller
         }
     
         $rules = [
-            'idSala'=>'required',
-            'numero'=>'required|numeric',
-            'fila'=>'required|alpha_num',
-            'estado'=>'required',
+            'idSala'=>'exists:salas,id',
+            'numero'=>'integer',
+            'fila'=>'string',
+            'estado'=>'boolean'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -144,14 +144,14 @@ class AsientoController extends Controller
         if(isset($data_input['idSala'])) { $asiento->idSala = $data_input['idSala']; }
         if(isset($data_input['numero'])) { $asiento->numero = $data_input['numero']; }
         if(isset($data_input['fila'])) { $asiento->fila = $data_input['fila']; }
-        if(isset($data_input['estado'])) { $asiento->estado = $data['estado'] ? 1 : 0; }
+        if(isset($data_input['estado'])) { $asiento->estado = $data_input['estado'] ? 1 : 0; }
 
         $asiento->save();
     
         $response = [
             'status' => 201,
             'message' => 'asiento actualizado',
-            'user' => $asiento
+            'asiento' => $asiento
         ];
     
         return response()->json($response, $response['status']);

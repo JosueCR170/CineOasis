@@ -3,46 +3,48 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Tarjeta;
+use App\Models\DetallesTicket;
 
-class TarjetaController extends Controller
+class DetallesTicketController extends Controller
 {
     //
     public function index()
-    {   
-        $data=Tarjeta::all();
+    {
+        $data=DetallesTicket::all();
+        $data=$data->load('asientos');
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de las tarjetas",
+            "message"=>"Todos los registros de los detalles de tickets",
             "data"=>$data
         );
         return response()->json($response,200);
     }
 
-    
     public function store(Request $request){
         $data_input=$request->input('data',null);
         if($data_input){
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idUsuario'=>'required|numeric|exists:users,id',
-                'numero'=>'required|numeric|unique:tarjetas,numero',
-                'fechaVencimiento'=>'required|date',
-                'codigo'=>'required|numeric'
+                'idTicket'=>'required|exists:tickets, id',
+                'idAsiento'=>'required|exists:asientos, id',
+                'subtotal'=>'required|decimal:0,4',
+                'descuento'=>'decimal:0,4',
+                'impuesto'=>'decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
-                $tarjeta=new Tarjeta();
-                $tarjeta->idUsuario=$data['idUsuario'];
-                $tarjeta->numero=$data['numero'];
-                $tarjeta->fechaVencimiento=$data['fechaVencimiento'];
-                $tarjeta->codigo=$data['codigo'];
-                $tarjeta->save();
+                $detallesTicket=new DetallesTicket();
+                $detallesTicket->idTicket=$data['idTicket'];
+                $detallesTicket->idAsiento=$data['idAsiento'];
+                $detallesTicket->subtotal=$data['subtotal'];
+                $detallesTicket->descuento=$data['descuento'];
+                $detallesTicket->impuesto=$data['impuesto'];
+                $detallesTicket->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'tarjeta creada',
-                    'tarjeta'=>$tarjeta
+                    'message'=>'detallesTicket creada',
+                    'Comida'=>$detallesTicket
                 );
             }else{
                 $response=array(
@@ -62,12 +64,13 @@ class TarjetaController extends Controller
 
     
     public function show($id){
-        $data=Tarjeta::find($id);
+        $data=DetallesTicket::find($id);
         if(is_object($data)){
+            $data=$data->load('asientos');
             $response=array(
                 'status'=>200,
-                'message'=>'Datos de la tarjeta',
-                'tarjeta'=>$data
+                'message'=>'Datos de los detalles ticket',
+                'detallesTicket'=>$data
             );
         }else{
             $response=array(
@@ -80,23 +83,23 @@ class TarjetaController extends Controller
 
     public function destroy($id){
         if(isset($id)){
-            $deleted=Tarjeta::where('id',$id)->delete();
+            $deleted=DetallesTicket::where('id',$id)->delete();
             if($deleted)
             {
                 $response=array(
                     'status'=>200,
-                    'message'=>'Tarjeta eliminada'
+                    'message'=>'detallesTicket eliminado'
                 );
             }else{
                 $response=array(
                     'status'=>400,
-                    'message'=>'No se pudo eliminar el recurso, compruebe que exista'
+                    'message'=>'No se pudo eliminar el detallesTicket, compruebe que exista'
                 );
             }
         }else{
             $response=array(
                 'status'=>406,
-                'message'=>'Falta el identificador del recurso a eliminar'
+                'message'=>'Falta el identificador del detallesTicket a eliminar'
             );
         }
         return response()->json($response,$response['status']);
@@ -104,12 +107,12 @@ class TarjetaController extends Controller
 
     //patch
     public function update(Request $request, $id) {
-        $tarjeta = Tarjeta::find($id);
+        $detallesTicket = DetallesTicket::find($id);
     
-        if (!$tarjeta) {
+        if (!$detallesTicket) {
             $response = [
                 'status' => 404,
-                'message' => 'Tarjeta no encontrada'
+                'message' => 'detallesTicket no encontrado'
             ];
             return response()->json($response, $response['status']);
         }
@@ -126,10 +129,11 @@ class TarjetaController extends Controller
         }
     
         $rules = [
-            'idUsuario'=>'numeric|exists:users,id',
-            'numero'=>'numeric|unique:tarjetas,numero',
-            'fechaVencimiento'=>'date',
-            'codigo'=>'numeric'
+            'idTicket'=>'exists:tickets, id',
+            'idAsiento'=>'exists:asientos, id',
+            'subtotal'=>'decimal:0,4',
+            'descuento'=>'decimal:0,4',
+            'impuesto'=>'decimal:0,4'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -143,19 +147,20 @@ class TarjetaController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        if(isset($data_input['numero'])) { $tarjeta->numero = $data_input['numero']; }
-        if(isset($data_input['fechaVencimiento'])) { $tarjeta->fechaVencimiento = $data_input['fechaVencimiento']; }
-        if(isset($data_input['codigo'])) { $tarjeta->codigo = $data_input['codigo']; }
-
-        $tarjeta->save();
+        if(isset($data_input['idTicket'])) { $detallesTicket->idTicket = $data_input['idTicket']; }
+        if(isset($data_input['idAsiento'])) { $detallesTicket->idAsiento = $data_input['idAsiento']; }
+        if(isset($data_input['subtotal'])) { $detallesTicket->subtotal = $data_input['subtotal']; }
+        if(isset($data_input['descuento'])) { $detallesTicket->descuento = $data_input['descuento']; }
+        if(isset($data_input['impuesto'])) { $detallesTicket->impuesto = $data_input['impuesto']; }
+        
+        $detallesTicket->save();
     
         $response = [
             'status' => 201,
-            'message' => 'Usuario actualizado',
-            'tarjeta' => $tarjeta
+            'message' => 'detallesTicket actualizado',
+            'detallesTicket' => $detallesTicket
         ];
     
         return response()->json($response, $response['status']);
     }
-    
 }
