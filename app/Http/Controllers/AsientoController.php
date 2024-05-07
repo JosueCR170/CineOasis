@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Asiento;
+use App\Models\Sala;
 
 class AsientoController extends Controller
 {
@@ -19,6 +20,7 @@ class AsientoController extends Controller
         return response()->json($response,200);
     }
     
+    /*
     public function store(Request $request){
         $data_input=$request->input('data',null);
         if($data_input){
@@ -57,6 +59,57 @@ class AsientoController extends Controller
             );
         }
         return response()->json($response,$response['status']);
+    }
+    */
+
+    //Sacada de chat 
+    public function store(Request $request){
+        $data_input = $request->input('data', null);
+        if ($data_input) {
+            $data = json_decode($data_input, true);
+            $data = array_map('trim', $data);
+            $rules = [
+                'idSala' => 'required',
+                'numero' => 'numeric',
+                'fila' => 'alpha_num',
+                'estado' => 'alpha',
+            ];
+            $isValid = validator($data, $rules);
+            if (!$isValid->fails()) {
+                // Obtener la capacidad de la sala
+                $sala = Sala::findOrFail($data['idSala']);
+                $capacidad = $sala->capacidad;
+    
+                // Crear los asientos
+                for ($i = 1; $i <= $capacidad; $i++) {
+                    $fila = 'F' . chr(64 + ceil($i / 10)); // Calcula la letra de la fila
+                    $numero = $i % 10 == 0 ? 10 : $i % 10; // Calcula el número de asiento
+                    $asiento = new Asiento();
+                    $asiento->idSala = $data['idSala'];
+                    $asiento->numero = $numero;
+                    $asiento->fila = $fila;
+                    $asiento->estado = 1; // Estado disponible
+                    $asiento->save();
+                }
+    
+                $response = [
+                    'status' => 201,
+                    'message' => 'Asientos creados',
+                ];
+            } else {
+                $response = [
+                    'status' => 406,
+                    'message' => 'Datos inválidos',
+                    'error' => $isValid->errors()
+                ];
+            }
+        } else {
+            $response = [
+                'status' => 400,
+                'message' => 'No se encontró el objeto data'
+            ];
+        }
+        return response()->json($response, $response['status']);
     }
     
     
@@ -144,7 +197,7 @@ class AsientoController extends Controller
         if(isset($data_input['idSala'])) { $asiento->idSala = $data_input['idSala']; }
         if(isset($data_input['numero'])) { $asiento->numero = $data_input['numero']; }
         if(isset($data_input['fila'])) { $asiento->fila = $data_input['fila']; }
-        if(isset($data_input['estado'])) { $asiento->estado = $data['estado'] ? 1 : 0; }
+        if(isset($data_input['estado'])) { $asiento->estado = $data_input['estado'] ? 1 : 0; }
 
         $asiento->save();
     
