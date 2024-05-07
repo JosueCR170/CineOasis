@@ -21,6 +21,7 @@ Route::prefix('v1')->group(
         //RUTAS ESPECIFICAS
 
         //RUTAS AUTOMATICAS Restful
+        Route::post('/user/login',[UserController::class,'login']);
         Route::resource('/tarjeta',TarjetaController::class,['except'=>['create','edit']]);
         Route::resource('/user',UserController::Class,['except'=>['create','edit']]);
         Route::resource('/sala',SalaController::class,['except'=>['create','edit']]);

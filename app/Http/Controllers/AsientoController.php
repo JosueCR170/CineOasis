@@ -144,7 +144,7 @@ class AsientoController extends Controller
         if(isset($data_input['idSala'])) { $asiento->idSala = $data_input['idSala']; }
         if(isset($data_input['numero'])) { $asiento->numero = $data_input['numero']; }
         if(isset($data_input['fila'])) { $asiento->fila = $data_input['fila']; }
-        if(isset($data_input['estado'])) { $asiento->estado = $data['estado'] ? 1 : 0; }
+        if(isset($data_input['estado'])) { $asiento->estado = $data_input['estado'] ? 1 : 0; }
 
         $asiento->save();
     

@@ -143,15 +143,15 @@ class DetallesComboController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        if(isset($data_input['nombre'])) { $comida->nombre = $data_input['nombre']; }
-        if(isset($data_input['precio'])) { $comida->precio = $data_input['precio']; }
+        if(isset($data_input['nombre'])) { $combo->nombre = $data_input['nombre']; }
+        if(isset($data_input['precio'])) { $combo->precio = $data_input['precio']; }
         
-        $comida->save();
+        $combo->save();
     
         $response = [
             'status' => 201,
             'message' => 'Comida actualizado',
-            'Comida' => $comida
+            'Combo' => $combo
         ];
     
         return response()->json($response, $response['status']);
