@@ -151,7 +151,7 @@ class TarjetaController extends Controller
     
         $response = [
             'status' => 201,
-            'message' => 'Usuario actualizado',
+            'message' => 'tarjeta actualizada',
             'tarjeta' => $tarjeta
         ];
     
