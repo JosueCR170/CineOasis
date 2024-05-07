@@ -11,9 +11,10 @@ class DetallesComboController extends Controller
     public function index()
     {
         $data=DetallesCombo::all();
+        $data=$data->load('comida');
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de las funciones",
+            "message"=>"Todos los registros de los detalles combo",
             "data"=>$data
         );
         return response()->json($response,200);
@@ -25,12 +26,12 @@ class DetallesComboController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idTicket'=>'numeric',
-                'idComida'=>'numeric',
-                'cantidad'=>'required',
-                'subtotal'=>'required|regex:/^\d{1,4}(\.\d{1,2})?$/',
-                'descuento'=>'regex:/^\d{1,4}(\.\d{1,2})?$/',
-                'impuesto'=>'regex:/^\d{1,4}(\.\d{1,2})?$/'
+                'idTicket'=>'required|exists:tickets,id',
+                'idComida'=>'required|exists:comida,id',
+                'cantidad'=>'required|integer',
+                'subtotal'=>'required|decimal:0,4',
+                'descuento'=>'decimal:0,4',
+                'impuesto'=>'decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
@@ -44,8 +45,8 @@ class DetallesComboController extends Controller
                 $combo->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'combo creada',
-                    'Comida'=>$combo
+                    'message'=>'combo creado',
+                    'combo'=>$combo
                 );
             }else{
                 $response=array(
@@ -67,10 +68,11 @@ class DetallesComboController extends Controller
     public function show($id){
         $data=DetallesCombo::find($id);
         if(is_object($data)){
+            $data=$data->load('comida');
             $response=array(
                 'status'=>200,
-                'message'=>'Datos de la comida',
-                'Comida'=>$data
+                'message'=>'Datos del combo',
+                'combo'=>$data
             );
         }else{
             $response=array(
@@ -112,7 +114,7 @@ class DetallesComboController extends Controller
         if (!$combo) {
             $response = [
                 'status' => 404,
-                'message' => 'combo no encontrada'
+                'message' => 'combo no encontrado'
             ];
             return response()->json($response, $response['status']);
         }
@@ -129,7 +131,12 @@ class DetallesComboController extends Controller
         }
     
         $rules = [
-            'nombre'=>'max:40',
+            'idTicket'=>'exists:tickets,id',
+                'idComida'=>'exists:comida,id',
+                'cantidad'=>'integer',
+                'subtotal'=>'decimal:0,4',
+                'descuento'=>'decimal:0,4',
+                'impuesto'=>'decimal:0,4'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -143,15 +150,18 @@ class DetallesComboController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        if(isset($data_input['nombre'])) { $combo->nombre = $data_input['nombre']; }
-        if(isset($data_input['precio'])) { $combo->precio = $data_input['precio']; }
+        if(isset($data_input['idComida'])) { $combo->idComida = $data_input['idComida']; }
+        if(isset($data_input['cantidad'])) { $combo->cantidad = $data_input['cantidad']; }
+        if(isset($data_input['subtotal'])) { $combo->subtotal = $data_input['subtotal']; }
+        if(isset($data_input['descuento'])) { $combo->descuento = $data_input['descuento']; }
+        if(isset($data_input['impuesto'])) { $combo->impuesto = $data_input['impuesto']; }
         
         $combo->save();
     
         $response = [
             'status' => 201,
-            'message' => 'Comida actualizado',
-            'Combo' => $combo
+            'message' => 'combo actualizado',
+            'combo' => $combo
         ];
     
         return response()->json($response, $response['status']);

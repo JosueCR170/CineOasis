@@ -10,10 +10,10 @@ class ComidaController extends Controller
     public function index()
     {
         $data=Comida::all();
-        $data=$data->load('detallesCombo');
+        //$data=$data->load('detallesCombo');
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de las funciones",
+            "message"=>"Todos los registros de las comidas",
             "data"=>$data
         );
         return response()->json($response,200);
@@ -25,8 +25,8 @@ class ComidaController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'nombre'=>'required|max:40',
-                'precio'=>'required|regex:/^\d{1,4}(\.\d{1,2})?$/'
+                'nombre'=>'required|max:40|string',
+                'precio'=>'required|decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
@@ -121,7 +121,8 @@ class ComidaController extends Controller
         }
     
         $rules = [
-            'nombre'=>'max:40',
+            'nombre'=>'max:40|string',
+            'precio'=>'decimal:0,4'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -142,7 +143,7 @@ class ComidaController extends Controller
     
         $response = [
             'status' => 201,
-            'message' => 'Comida actualizado',
+            'message' => 'Comida actualizada',
             'Comida' => $comida
         ];
     

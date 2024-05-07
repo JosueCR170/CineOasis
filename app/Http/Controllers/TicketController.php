@@ -3,21 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Asiento;
+use App\Models\Ticket;
 
-class AsientoController extends Controller
+class TicketController extends Controller
 {
     //
     public function index()
-    {
-        $data=Asiento::all();
+    {   
+        $data=Ticket::all();
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de los asientos",
+            "message"=>"Todos los registros de los tickets",
             "data"=>$data
         );
         return response()->json($response,200);
     }
+
     
     public function store(Request $request){
         $data_input=$request->input('data',null);
@@ -25,23 +26,25 @@ class AsientoController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idSala'=>'required|exists:salas,id',
-                'numero'=>'required|integer',
-                'fila'=>'required|string',
-                'estado'=>'required|boolean'
+                'idUsuario'=>'required|exists:users,id',
+                'idFuncion'=>'required|exists:funciones,id',
+                'cantEntradas'=>'required|integer',
+                'fechaCompra'=>'required|date',
+                'precioTotal'=>'required|decimal:0,4|integer'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
-                $asiento=new Asiento();
-                $asiento->idSala = $data['idSala'];
-                $asiento->numero=$data['numero'];
-                $asiento->fila=$data['fila'];
-                $asiento->estado = $data['estado'] ? 1 : 0;
-                $asiento->save();
+                $ticket=new Ticket();
+                $ticket->idUsuario=$data['idUsuario'];
+                $ticket->idFuncion=$data['idFuncion'];
+                $ticket->cantEntradas=$data['cantEntradas'];
+                $ticket->fechaCompra=$data['fechaCompra'];
+                $ticket->precioTotal=$data['precioTotal'];
+                $ticket->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'Asiento creado',
-                    'asiento'=>$asiento
+                    'message'=>'ticket creado',
+                    'tarjeta'=>$ticket
                 );
             }else{
                 $response=array(
@@ -58,15 +61,15 @@ class AsientoController extends Controller
         }
         return response()->json($response,$response['status']);
     }
-    
+
     
     public function show($id){
-        $data=Asiento::find($id);
+        $data=Ticket::find($id);
         if(is_object($data)){
             $response=array(
                 'status'=>200,
-                'message'=>'Datos del asiento',
-                'asiento$asiento'=>$data
+                'message'=>'Datos del ticket',
+                'tarjeta'=>$data
             );
         }else{
             $response=array(
@@ -79,12 +82,12 @@ class AsientoController extends Controller
 
     public function destroy($id){
         if(isset($id)){
-            $deleted=Asiento::where('id',$id)->delete();
+            $deleted=Ticket::where('id',$id)->delete();
             if($deleted)
             {
                 $response=array(
                     'status'=>200,
-                    'message'=>'Asiento eliminado'
+                    'message'=>'Ticket eliminado'
                 );
             }else{
                 $response=array(
@@ -103,12 +106,12 @@ class AsientoController extends Controller
 
     //patch
     public function update(Request $request, $id) {
-        $asiento = asiento::find($id);
+        $ticket = Ticket::find($id);
     
-        if (!$asiento) {
+        if (!$ticket) {
             $response = [
                 'status' => 404,
-                'message' => 'asiento no encontrado'
+                'message' => 'ticket no encontrado'
             ];
             return response()->json($response, $response['status']);
         }
@@ -125,10 +128,11 @@ class AsientoController extends Controller
         }
     
         $rules = [
-            'idSala'=>'exists:salas,id',
-            'numero'=>'integer',
-            'fila'=>'string',
-            'estado'=>'boolean'
+            'idUsuario'=>'exists:users,id',
+            'idFuncion'=>'exists:funciones,id',
+            'cantEntradas'=>'integer',
+            'fechaCompra'=>'date',
+            'precioTotal'=>'decimal:0,4|integer'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -141,22 +145,21 @@ class AsientoController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-        if(isset($data_input['idSala'])) { $asiento->idSala = $data_input['idSala']; }
-        if(isset($data_input['numero'])) { $asiento->numero = $data_input['numero']; }
-        if(isset($data_input['fila'])) { $asiento->fila = $data_input['fila']; }
-        if(isset($data_input['estado'])) { $asiento->estado = $data_input['estado'] ? 1 : 0; }
+    
+        if(isset($data_input['idUsuario'])) { $ticket->idUsuario = $data_input['idUsuario']; }
+        if(isset($data_input['idFuncion'])) { $ticket->idFuncion = $data_input['idFuncion']; }
+        if(isset($data_input['cantEntradas'])) { $ticket->cantEntradas = $data_input['cantEntradas']; }
+        if(isset($data_input['fechaCompra'])) { $ticket->fechaCompra = $data_input['fechaCompra']; }
+        if(isset($data_input['precioTotal'])) { $ticket->precioTotal = $data_input['precioTotal']; }
 
-        $asiento->save();
+        $ticket->save();
     
         $response = [
             'status' => 201,
-            'message' => 'asiento actualizado',
-            'asiento' => $asiento
+            'message' => 'Usuario actualizado',
+            'ticket' => $ticket
         ];
     
         return response()->json($response, $response['status']);
     }
-
-
-
 }

@@ -11,9 +11,10 @@ class SalaController extends Controller
     public function index()
     {
         $data=Sala::all();
+        $data=$data->load('asientos');
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de la categoria",
+            "message"=>"Todos los registros de las salas",
             "data"=>$data
         );
         return response()->json($response,200);
@@ -25,8 +26,8 @@ class SalaController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'nombreSala'=>'required|alpha_num',
-                'capacidad'=>'required|numeric',
+                'nombreSala'=>'required|string',
+                'capacidad'=>'required|integer',
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
@@ -37,7 +38,7 @@ class SalaController extends Controller
                 $response=array(
                     'status'=>201,
                     'message'=>'Sala creada',
-                    'user'=>$sala
+                    'sala'=>$sala
                 );
             }else{
                 $response=array(
@@ -59,6 +60,7 @@ class SalaController extends Controller
     public function show($id){
         $data=Sala::find($id);
         if(is_object($data)){
+            $data=$data->load('asientos');
             $response=array(
                 'status'=>200,
                 'message'=>'Datos de la sala',
@@ -121,8 +123,8 @@ class SalaController extends Controller
         }
     
         $rules = [
-            'nombreSala' => 'required|alpha_num',
-            'capacidad' => 'required|numeric',
+            'nombreSala'=>'string',
+                'capacidad'=>'integer',
         ];
     
         $validator = \validator($data_input, $rules);
@@ -144,7 +146,7 @@ class SalaController extends Controller
         $response = [
             'status' => 201,
             'message' => 'Sala actualizada',
-            'user' => $sala
+            'sala' => $sala
         ];
     
         return response()->json($response, $response['status']);

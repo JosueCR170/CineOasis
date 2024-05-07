@@ -3,45 +3,48 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Asiento;
+use App\Models\DetallesTicket;
 
-class AsientoController extends Controller
+class DetallesTicketController extends Controller
 {
     //
     public function index()
     {
-        $data=Asiento::all();
+        $data=DetallesTicket::all();
+        $data=$data->load('asientos');
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de los asientos",
+            "message"=>"Todos los registros de los detalles de tickets",
             "data"=>$data
         );
         return response()->json($response,200);
     }
-    
+
     public function store(Request $request){
         $data_input=$request->input('data',null);
         if($data_input){
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idSala'=>'required|exists:salas,id',
-                'numero'=>'required|integer',
-                'fila'=>'required|string',
-                'estado'=>'required|boolean'
+                'idTicket'=>'required|exists:tickets, id',
+                'idAsiento'=>'required|exists:asientos, id',
+                'subtotal'=>'required|decimal:0,4',
+                'descuento'=>'decimal:0,4',
+                'impuesto'=>'decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
-                $asiento=new Asiento();
-                $asiento->idSala = $data['idSala'];
-                $asiento->numero=$data['numero'];
-                $asiento->fila=$data['fila'];
-                $asiento->estado = $data['estado'] ? 1 : 0;
-                $asiento->save();
+                $detallesTicket=new DetallesTicket();
+                $detallesTicket->idTicket=$data['idTicket'];
+                $detallesTicket->idAsiento=$data['idAsiento'];
+                $detallesTicket->subtotal=$data['subtotal'];
+                $detallesTicket->descuento=$data['descuento'];
+                $detallesTicket->impuesto=$data['impuesto'];
+                $detallesTicket->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'Asiento creado',
-                    'asiento'=>$asiento
+                    'message'=>'detallesTicket creada',
+                    'Comida'=>$detallesTicket
                 );
             }else{
                 $response=array(
@@ -58,15 +61,16 @@ class AsientoController extends Controller
         }
         return response()->json($response,$response['status']);
     }
-    
+
     
     public function show($id){
-        $data=Asiento::find($id);
+        $data=DetallesTicket::find($id);
         if(is_object($data)){
+            $data=$data->load('asientos');
             $response=array(
                 'status'=>200,
-                'message'=>'Datos del asiento',
-                'asiento$asiento'=>$data
+                'message'=>'Datos de los detalles ticket',
+                'detallesTicket'=>$data
             );
         }else{
             $response=array(
@@ -79,23 +83,23 @@ class AsientoController extends Controller
 
     public function destroy($id){
         if(isset($id)){
-            $deleted=Asiento::where('id',$id)->delete();
+            $deleted=DetallesTicket::where('id',$id)->delete();
             if($deleted)
             {
                 $response=array(
                     'status'=>200,
-                    'message'=>'Asiento eliminado'
+                    'message'=>'detallesTicket eliminado'
                 );
             }else{
                 $response=array(
                     'status'=>400,
-                    'message'=>'No se pudo eliminar el recurso, compruebe que exista'
+                    'message'=>'No se pudo eliminar el detallesTicket, compruebe que exista'
                 );
             }
         }else{
             $response=array(
                 'status'=>406,
-                'message'=>'Falta el identificador del recurso a eliminar'
+                'message'=>'Falta el identificador del detallesTicket a eliminar'
             );
         }
         return response()->json($response,$response['status']);
@@ -103,12 +107,12 @@ class AsientoController extends Controller
 
     //patch
     public function update(Request $request, $id) {
-        $asiento = asiento::find($id);
+        $detallesTicket = DetallesTicket::find($id);
     
-        if (!$asiento) {
+        if (!$detallesTicket) {
             $response = [
                 'status' => 404,
-                'message' => 'asiento no encontrado'
+                'message' => 'detallesTicket no encontrado'
             ];
             return response()->json($response, $response['status']);
         }
@@ -125,10 +129,11 @@ class AsientoController extends Controller
         }
     
         $rules = [
-            'idSala'=>'exists:salas,id',
-            'numero'=>'integer',
-            'fila'=>'string',
-            'estado'=>'boolean'
+            'idTicket'=>'exists:tickets, id',
+            'idAsiento'=>'exists:asientos, id',
+            'subtotal'=>'decimal:0,4',
+            'descuento'=>'decimal:0,4',
+            'impuesto'=>'decimal:0,4'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -141,22 +146,21 @@ class AsientoController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-        if(isset($data_input['idSala'])) { $asiento->idSala = $data_input['idSala']; }
-        if(isset($data_input['numero'])) { $asiento->numero = $data_input['numero']; }
-        if(isset($data_input['fila'])) { $asiento->fila = $data_input['fila']; }
-        if(isset($data_input['estado'])) { $asiento->estado = $data_input['estado'] ? 1 : 0; }
-
-        $asiento->save();
+    
+        if(isset($data_input['idTicket'])) { $detallesTicket->idTicket = $data_input['idTicket']; }
+        if(isset($data_input['idAsiento'])) { $detallesTicket->idAsiento = $data_input['idAsiento']; }
+        if(isset($data_input['subtotal'])) { $detallesTicket->subtotal = $data_input['subtotal']; }
+        if(isset($data_input['descuento'])) { $detallesTicket->descuento = $data_input['descuento']; }
+        if(isset($data_input['impuesto'])) { $detallesTicket->impuesto = $data_input['impuesto']; }
+        
+        $detallesTicket->save();
     
         $response = [
             'status' => 201,
-            'message' => 'asiento actualizado',
-            'asiento' => $asiento
+            'message' => 'detallesTicket actualizado',
+            'detallesTicket' => $detallesTicket
         ];
     
         return response()->json($response, $response['status']);
     }
-
-
-
 }

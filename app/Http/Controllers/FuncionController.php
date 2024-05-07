@@ -11,6 +11,8 @@ class FuncionController extends Controller
     public function index()
     {
         $data=Funcion::all();
+        $data=$data->load('peliculas');
+        $data=$data->load('salas');
         $response=array(
             "status"=>200,
             "message"=>"Todos los registros de las funciones",
@@ -25,14 +27,18 @@ class FuncionController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
+                'idPelicula'=>'required|exists:peliculas,id',
+                'idSala'=> 'required|exists:salas,id',
                 'fecha'=>'required|date',
-                'horaInicio'=>'required',
-                'horaFinal'=>'required',
-                'precio'=>'required',
+                'horaInicio'=>'required|date_format:H:i:s',
+                'horaFinal'=>'required|date_format:H:i:s',
+                'precio'=>'required|decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
                 $funcion=new Funcion();
+                $funcion->idPelicula=$data['idPelicula'];
+                $funcion->idSala=$data['idSala'];
                 $funcion->fecha=$data['fecha'];
                 $funcion->horaInicio=$data['horaInicio'];
                 $funcion->horaFinal=$data['horaFinal'];
@@ -41,7 +47,7 @@ class FuncionController extends Controller
                 $response=array(
                     'status'=>201,
                     'message'=>'Funcion creada',
-                    'funcion$funcion'=>$funcion
+                    'funcion'=>$funcion
                 );
             }else{
                 $response=array(
@@ -63,10 +69,12 @@ class FuncionController extends Controller
     public function show($id){
         $data=Funcion::find($id);
         if(is_object($data)){
+            $data=$data->load('peliculas');
+            $data=$data->load('salas');
             $response=array(
                 'status'=>200,
                 'message'=>'Datos de la funcion',
-                'funcion$funcion'=>$data
+                'funcion'=>$data
             );
         }else{
             $response=array(
@@ -84,7 +92,7 @@ class FuncionController extends Controller
             {
                 $response=array(
                     'status'=>200,
-                    'message'=>'Funcion eliminado'
+                    'message'=>'Funcion eliminada'
                 );
             }else{
                 $response=array(
@@ -125,10 +133,12 @@ class FuncionController extends Controller
         }
     
         $rules = [
-            'fecha'=>'required|date',
-            'horaInicio'=>'required',
-            'horaFinal'=>'required',
-            'precio'=>'required',
+            'idPelicula'=>'exists:peliculas,id',
+            'idSala'=> 'exists:salas,id',
+            'fecha'=>'date',
+            'horaInicio'=>'date_format:H:i:s',
+            'horaFinal'=>'date_format:H:i:s',
+            'precio'=>'decimal:0,4'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -142,6 +152,9 @@ class FuncionController extends Controller
             return response()->json($response, $response['status']);
         }
     
+        if(isset($data_input['idPelicula'])) { $funcion->idPelicula = $data_input['idPelicula']; }
+        if(isset($data_input['idSala'])) { $funcion->idSala = $data_input['idSala']; }
+
         if(isset($data_input['fecha'])) { $funcion->fecha = $data_input['fecha']; }
         if(isset($data_input['horaInicio'])) { $funcion->horaInicio = $data_input['horaInicio']; }
         if(isset($data_input['horaFinal'])) { $funcion->horaFinal = $data_input['horaFinal']; }
@@ -151,8 +164,8 @@ class FuncionController extends Controller
     
         $response = [
             'status' => 201,
-            'message' => 'Funcion actualizado',
-            'funcion$funcion' => $funcion
+            'message' => 'Funcion actualizada',
+            'funcion' => $funcion
         ];
     
         return response()->json($response, $response['status']);

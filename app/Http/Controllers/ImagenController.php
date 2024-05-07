@@ -117,57 +117,6 @@ class ImagenController extends Controller
             }
             return response()->json($response,$response['status']);
         }
-
-
-<<<<<<< HEAD
-    public function update(Request $request, $id) {
-        $imagen = Imagen::find($id);
-    
-        if (!$imagen) {
-            $response = [
-                'status' => 404,
-                'message' => 'Imagen no encontrada'
-            ];
-            return response()->json($response, $response['status']);
-        }
-        $data_input = $request->input('data', null);
-        $image_input = $request->file('imagen');
-    
-        if ($data_input || $image_input) {
-            $data = json_decode($data_input, true) ?: [];
-            $data = array_map('trim', $data);
-            $rules = [
-                'idPelicula' => 'exists:peliculas,id'
-            ];
-            $isValid = \validator($data, $rules);
-            if(!$isValid->fails()) {
-                $imagen->idPelicula = $data['idPelicula']; 
-                $imagen->descripcion = $data['descripcion'];
-                $imagen->imagen = base64_encode(file_get_contents($image_input)); 
-    
-                $imagen->save();
-                $response = [
-                    'status' => 200,
-                    'message' => 'Imagen actualizada',
-                    'imagen' => $imagen
-                ];
-            } 
-            else {
-                $response = [
-                    'status' => 406,
-                    'message' => 'Datos inválidos',
-                    'errors' => $isValid->errors()
-                ];
-            }
-        } else {
-            $response = [
-                'status' => 400,
-                'message' => 'No se encontraron los datos de la imagen'
-            ];
-        }
-        return response()->json($response, $response['status']);
-    }
-=======
         public function update(Request $request, $id) {
             $imagen = Imagen::find($id);
             
@@ -253,8 +202,5 @@ class ImagenController extends Controller
         
             return response()->json($response, $response['status']);
         }
-        
-        
->>>>>>> 791d98f72c2b873f7618a6a5722af73a9879b5aa
     
 }

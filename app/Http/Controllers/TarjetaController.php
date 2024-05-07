@@ -67,7 +67,7 @@ class TarjetaController extends Controller
             $response=array(
                 'status'=>200,
                 'message'=>'Datos de la tarjeta',
-                'user'=>$data
+                'tarjeta'=>$data
             );
         }else{
             $response=array(
@@ -151,7 +151,7 @@ class TarjetaController extends Controller
     
         $response = [
             'status' => 201,
-            'message' => 'Usuario actualizado',
+            'message' => 'tarjeta actualizada',
             'tarjeta' => $tarjeta
         ];
     
