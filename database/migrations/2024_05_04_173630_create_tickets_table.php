@@ -13,7 +13,22 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+
+            $table->foreignId('idUsuario')
+            ->constrained('users')
+            ->nullable()
+            ->cascadeOnUpdate()
+            ->cascadeOnDelete();
+
+            $table->foreignId('idFuncion')
+            ->constrained('funciones')
+            ->nullable()
+            ->cascadeOnUpdate()
+            ->cascadeOnDelete();
+
+            $table->integer('cantEntradas');
+            $table->date('fechaCompra');
+            $table->float('precioTotal');
         });
     }
 

@@ -13,6 +13,10 @@ class Asiento extends Model
     protected $fillable=['numero','fila','estado'];
 
     public function sala(){
-        return $this->belongsTo(Sala::class,'id');
+        return $this->belongsTo(Sala::class,'idSala');
+    }
+
+    public function detallesTicket(){
+        return $this->hasMany(DetallesTicket::class, 'idAsiento');
     }
 }

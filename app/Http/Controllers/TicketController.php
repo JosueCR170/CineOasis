@@ -3,50 +3,48 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Helpers\JwtAuth;
+use App\Models\Ticket;
 
-class UserController extends Controller
+class TicketController extends Controller
 {
+    //
     public function index()
-    {
-        $data=User::all();
-        $data = User::with('tarjetas')->get();
+    {   
+        $data=Ticket::all();
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de los usuarios",
+            "message"=>"Todos los registros de los tickets",
             "data"=>$data
         );
         return response()->json($response,200);
     }
 
+    
     public function store(Request $request){
         $data_input=$request->input('data',null);
         if($data_input){
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'name'=>'required|alpha|max:30',
-                'apellido'=>'required|alpha|max:40',
-                'email'=>'required|email|unique:users,email',
-                'password'=>'required|alpha_dash',
-                'fechaNacimiento'=>'required|date',
-                'permisoAdmin'=>'required|boolean'
+                'idUsuario'=>'required|exists:users,id',
+                'idFuncion'=>'required|exists:funciones,id',
+                'cantEntradas'=>'required|integer',
+                'fechaCompra'=>'required|date',
+                'precioTotal'=>'required|decimal:0,4|integer'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
-                $user=new User();
-                $user->name=$data['name'];
-                $user->apellido=$data['apellido'];
-                $user->email=$data['email'];
-                $user->password=$data['password'];
-                $user->fechaNacimiento=$data['fechaNacimiento'];
-                $user->permisoAdmin=$data['permisoAdmin'];
-                $user->save();
+                $ticket=new Ticket();
+                $ticket->idUsuario=$data['idUsuario'];
+                $ticket->idFuncion=$data['idFuncion'];
+                $ticket->cantEntradas=$data['cantEntradas'];
+                $ticket->fechaCompra=$data['fechaCompra'];
+                $ticket->precioTotal=$data['precioTotal'];
+                $ticket->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'usuario creado',
-                    'user'=>$user
+                    'message'=>'ticket creado',
+                    'tarjeta'=>$ticket
                 );
             }else{
                 $response=array(
@@ -66,13 +64,12 @@ class UserController extends Controller
 
     
     public function show($id){
-        $data=User::find($id);
+        $data=Ticket::find($id);
         if(is_object($data)){
-            $data=$data->load('tarjetas');
             $response=array(
                 'status'=>200,
-                'message'=>'Datos del usuario',
-                'user'=>$data
+                'message'=>'Datos del ticket',
+                'tarjeta'=>$data
             );
         }else{
             $response=array(
@@ -85,12 +82,12 @@ class UserController extends Controller
 
     public function destroy($id){
         if(isset($id)){
-            $deleted=User::where('id',$id)->delete();
+            $deleted=Ticket::where('id',$id)->delete();
             if($deleted)
             {
                 $response=array(
                     'status'=>200,
-                    'message'=>'Usuario eliminado'
+                    'message'=>'Ticket eliminado'
                 );
             }else{
                 $response=array(
@@ -109,12 +106,12 @@ class UserController extends Controller
 
     //patch
     public function update(Request $request, $id) {
-        $user = User::find($id);
+        $ticket = Ticket::find($id);
     
-        if (!$user) {
+        if (!$ticket) {
             $response = [
                 'status' => 404,
-                'message' => 'Usuario no encontrado'
+                'message' => 'ticket no encontrado'
             ];
             return response()->json($response, $response['status']);
         }
@@ -131,12 +128,11 @@ class UserController extends Controller
         }
     
         $rules = [
-            'name'=>'alpha|max:30',
-            'apellido'=>'alpha|max:40',
-            'email'=>'email|unique:users,email',
-            'password'=>'alpha_dash',
-            'fechaNacimiento'=>'date',
-            'permisoAdmin'=>'boolean'
+            'idUsuario'=>'exists:users,id',
+            'idFuncion'=>'exists:funciones,id',
+            'cantEntradas'=>'integer',
+            'fechaCompra'=>'date',
+            'precioTotal'=>'decimal:0,4|integer'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -150,43 +146,20 @@ class UserController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        if(isset($data_input['name'])) { $user->name = $data_input['name']; }
-        if(isset($data_input['apellido'])) { $user->apellido = $data_input['apellido']; }
-        if(isset($data_input['email'])) { $user->email = $data_input['email']; }
-        if(isset($data_input['password'])) { $user->password = $data_input['password']; }
-        if(isset($data_input['fechaNacimiento'])) { $user->fechaNacimiento = $data_input['fechaNacimiento']; }
-        if(isset($data_input['permisoAdmin'])) { $user->permisoAdmin = $data_input['permisoAdmin']; }
+        if(isset($data_input['idUsuario'])) { $ticket->idUsuario = $data_input['idUsuario']; }
+        if(isset($data_input['idFuncion'])) { $ticket->idFuncion = $data_input['idFuncion']; }
+        if(isset($data_input['cantEntradas'])) { $ticket->cantEntradas = $data_input['cantEntradas']; }
+        if(isset($data_input['fechaCompra'])) { $ticket->fechaCompra = $data_input['fechaCompra']; }
+        if(isset($data_input['precioTotal'])) { $ticket->precioTotal = $data_input['precioTotal']; }
 
-        $user->save();
+        $ticket->save();
     
         $response = [
             'status' => 201,
             'message' => 'Usuario actualizado',
-            'user' => $user
+            'ticket' => $ticket
         ];
     
         return response()->json($response, $response['status']);
     }
-    
-    public function login(Request $request){
-        $data_input=$request->input('data',null);
-        $data=json_decode($data_input,true);
-        $data=array_map('trim',$data);
-        $rules=['email'=>'required','password'=>'required'];
-        $isValid=\validator($data,$rules);
-        if(!$isValid->fails()){
-            $jwt=new JwtAuth();
-            $response=$jwt->getToken($data['email'],$data['password']);
-            return response()->json($response);
-        }else{
-            $response=array(
-                'status'=>406,
-                'message'=>'Error en la validación de los datos',
-                'errors'=>$isValid->errors(),
-            );
-            return response()->json($response,406);
-        }
-
-    }
-    
 }
