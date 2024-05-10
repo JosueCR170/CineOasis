@@ -26,7 +26,7 @@ class JwtAuth{
                 'fechaNacimiento'=>$user->fechaNacimiento,
                 'permisoAdmin'=>$user->permisoAdmin,
                 'iat'=>time(),
-                'exp'=>time()+(2000)
+                'exp'=>time()+(5000)
             );
             $data=JWT::encode($token,$this->key,'HS256');
         }else{
