@@ -25,6 +25,7 @@ Route::prefix('v1')->group(
         //RUTAS AUTOMATICAS Restful
         Route::resource('/tarjeta',TarjetaController::class,['except'=>['create','edit']]);
         Route::resource('/user',UserController::Class,['except'=>['create','edit']]);
+        
         Route::resource('/pelicula',PeliculaController::class,['except'=>['create','edit']]);
         Route::resource('/imagen',ImagenController::class,['except'=>['create','edit']]);
         Route::resource('/sala',SalaController::class,['except'=>['create','edit']]);
