@@ -169,24 +169,51 @@ class UserController extends Controller
     }
     
     public function login(Request $request){
-        $data_input=$request->input('data',null);
-        $data=json_decode($data_input,true);
-        $data=array_map('trim',$data);
-        $rules=['email'=>'required','password'=>'required'];
-        $isValid=\validator($data,$rules);
-        if(!$isValid->fails()){
-            $jwt=new JwtAuth();
-            $response=$jwt->getToken($data['email'],$data['password']);
+        $data_input = $request->input('data', null);
+        $data = json_decode($data_input, true);
+    
+        // Verificar si $data es null o no antes de usar array_map()
+        if ($data !== null) {
+            $data = array_map('trim', $data);
+        } else {
+            // Manejar el caso en que $data es null
+            // Por ejemplo, puedes devolver un error de JSON
+            $response = array(
+                'status' => 400,
+                'message' => 'No se proporcionaron datos válidos',
+            );
+            return response()->json($response, 400);
+        }
+    
+        $rules = ['email' => 'required', 'password' => 'required'];
+        $isValid = \validator($data, $rules);
+    
+        if (!$isValid->fails()) {
+            $jwt = new JwtAuth();
+            $response = $jwt->getToken($data['email'], $data['password']);
             return response()->json($response);
+        } else {
+            $response = array(
+                'status' => 406,
+                'message' => 'Error en la validación de los datos',
+                'errors' => $isValid->errors(),
+            );
+            return response()->json($response, 406);
+        }
+    }
+    
+    public function getIdentity(Request $request){
+        $jwt=new JwtAuth();
+        $token=$request->header('bearertoken');
+        if(isset($token)){
+            $response=$jwt->checkToken($token,true);
         }else{
             $response=array(
-                'status'=>406,
-                'message'=>'Error en la validación de los datos',
-                'errors'=>$isValid->errors(),
+                'status'=>404,
+                'message'=>'token (bearertoken) no encontrado',
             );
-            return response()->json($response,406);
         }
-
+        return response()->json($response);
     }
     
 }
