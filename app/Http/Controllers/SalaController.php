@@ -11,7 +11,7 @@ class SalaController extends Controller
     public function index()
     {
         $data=Sala::all();
-        $data=$data->load('asientos');
+       $data=$data->load('asientos');
         $response=array(
             "status"=>200,
             "message"=>"Todos los registros de las salas",
@@ -102,7 +102,6 @@ class SalaController extends Controller
     //patch
     public function update(Request $request, $id) {
         $sala = Sala::find($id);
-    
         if (!$sala) {
             $response = [
                 'status' => 404,

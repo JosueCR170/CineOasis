@@ -48,6 +48,7 @@ class User extends Authenticatable
 
     public function tarjetas(){
         return $this->hasMany(Tarjeta::class, 'idUsuario');
+        
     }
 
     public function tickets(){
