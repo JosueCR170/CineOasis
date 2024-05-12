@@ -8,7 +8,7 @@ use App\Helpers\JwtAuth;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index()//listo
     {
         $data=User::all();
         $data = User::with('tarjetas')->get();
@@ -20,7 +20,7 @@ class UserController extends Controller
         return response()->json($response,200);
     }
 
-    public function store(Request $request){
+    public function store(Request $request){//listo
         $data_input=$request->input('data',null);
         if($data_input){
             $data=json_decode($data_input,true);
@@ -39,7 +39,7 @@ class UserController extends Controller
                 $user->name=$data['name'];
                 $user->apellido=$data['apellido'];
                 $user->email=$data['email'];
-                $user->password=$data['password'];
+                $user->password=hash('sha256',$data['password']);
                 $user->fechaNacimiento=$data['fechaNacimiento'];
                 $user->permisoAdmin=$data['permisoAdmin'];
                 $user->save();
@@ -65,7 +65,7 @@ class UserController extends Controller
     }
 
     
-    public function show($id){
+    public function show($id){//listo
         $data=User::find($id);
         if(is_object($data)){
             $data=$data->load('tarjetas');
@@ -108,9 +108,8 @@ class UserController extends Controller
     }
 
     //patch
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id) { //listo
         $user = User::find($id);
-    
         if (!$user) {
             $response = [
                 'status' => 404,
@@ -168,7 +167,7 @@ class UserController extends Controller
         return response()->json($response, $response['status']);
     }
     
-    public function login(Request $request){
+    public function login(Request $request){ //listo
         $data_input = $request->input('data', null);
         $data = json_decode($data_input, true);
     
@@ -202,7 +201,7 @@ class UserController extends Controller
         }
     }
     
-    public function getIdentity(Request $request){
+    public function getIdentity(Request $request){//listo
         $jwt=new JwtAuth();
         $token=$request->header('bearertoken');
         if(isset($token)){

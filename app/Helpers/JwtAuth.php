@@ -15,7 +15,7 @@ class JwtAuth{
     public function getToken($email,$password){
         $pass=hash('sha256',$password);
         //var_dump($pass);
-        $user=User::where(['email'=>$email,'password'=>$password])->first();
+        $user=User::where(['email'=>$email, 'password'=> hash('sha256',$password)])->first();
         //var_dump($user);
         if(is_object($user)){
             $token=array(
@@ -26,7 +26,7 @@ class JwtAuth{
                 'fechaNacimiento'=>$user->fechaNacimiento,
                 'permisoAdmin'=>$user->permisoAdmin,
                 'iat'=>time(),
-                'exp'=>time()+(5000)
+                'exp'=>time()+(60*60)
             );
             $data=JWT::encode($token,$this->key,'HS256');
         }else{
