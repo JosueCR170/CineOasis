@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\Imagen;
 // use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -21,95 +22,61 @@ class ImagenController extends Controller
         return response()->json($response,200);
     }
     
- 
-    public function store(Request $request){
-        $data_input = $request->input('data', null);
-        
-        // Verificar si hay una imagen cargada en la solicitud
-        if ($request->hasFile('imagen')) {
-            $image = $request->file('imagen');
-    
-            // Verificar si el archivo es una imagen
-            if ($image->isValid() && strpos($image->getMimeType(), 'image/') === 0) {
-    
-                if($data_input && $image){
-                    $data = json_decode($data_input, true) ?: [];
-                    $data = array_map('trim', $data);
-    
-                    $rules = [
-                        'idPelicula' => 'required|exists:peliculas,id',
-                        'descripcion' => 'required',
-                        'imagen' => 'image' // Regla de validación para asegurarse de que sea una imagen
-                    ];
-    
-                    $isValid = \validator($data, $rules);
-    
-                    if(!$isValid->fails()){
-                        $imagen = new Imagen();
-                        $imagen->idPelicula = $data['idPelicula']; 
-                        $imagen->imagen = base64_encode(file_get_contents($image)); 
-                        $imagen->descripcion = $data['descripcion'];
-    
-                        $imagen->save();
-                        $response = [
-                            'status' => 201,
-                            'message' => 'Imagen creada',
-                            'imagen' => $imagen
-                        ];
-                    } else {
-                        $response = [
-                            'status' => 406,
-                            'message' => 'Datos inválidos',
-                            'errors' => $isValid->errors()
-                        ];
-                    }
-                } else {
-                    $response = [
-                        'status' => 400,
-                        'message' => 'No se encontraron los datos de la imagen'
-                    ];
-                }
-            } else {
-                $response = [
-                    'status' => 400,
-                    'message' => 'El archivo no es una imagen válida'
-                ];
-            }
+
+    public function store(Request $request) {
+    $data_input = $request->input('data', null);
+    $file = $request->file('file');
+
+    if ($data_input && $file) {
+        $data = json_decode($data_input, true);
+        $data = array_map('trim', $data);
+
+        $isValid = \Validator::make($data, [
+            'idPelicula' => 'required|exists:peliculas,id',
+            'descripcion' => 'required',
+        ]);
+
+        if (!$isValid->fails()) {
+            $imagen = new Imagen();
+            $filename = \Str::uuid() . "." . $file->getClientOriginalExtension();
+
+            \Storage::disk('peliculas')->put($filename, \File::get($file));
+
+            $imagen->idPelicula = $data['idPelicula'];
+            $imagen->descripcion = $data['descripcion'];
+            $imagen->imagen = $filename;
+            $imagen->save();
+
+            $response = [
+                'status' => 201,
+                'message' => 'Imagen guardada',
+                'filename' => $filename
+            ];
         } else {
             $response = [
-                'status' => 400,
-                'message' => 'No se cargó ninguna imagen'
+                'status' => 406,
+                'message' => 'Error: verifica rellenar todos los datos',
+                'error' => $isValid->errors()
             ];
         }
-    
-        return response()->json($response, $response['status']);
+    } else {
+        $response = [
+            'status' => 400,
+            'message' => 'No se encontraron todos los datos necesarios'
+        ];
     }
-    
-    
 
-        public function show($id){
-            $data=Imagen::find($id);
-            if(is_object($data)){
-                $response=array(
-                'status'=>200,
-                'menssage'=>'Imagen encontrada',
-                'category'=>$data
-                );
-            }
-            else{
-                $response = array(
-                    'status'=>404,
-                    'menssage'=>'Recurso no encontrado'
-                );
-
-            }
-            return response()->json($response,$response['status']);
-        }
+    return response()->json($response, $response['status']);
+}
       
         public function destroy($id){
             if(isset($id)){
+                $imagen=Imagen::find($id);
                 $delete=Imagen::where('id',$id)->delete();
                 if($delete){
+                  
+                    $filename= $imagen->imagen;
+                    \Storage::disk('peliculas')->delete($filename);
                     $response=array(
                         'status'=>200,
                         'menssage'=>'Imagen eliminada',
@@ -128,9 +95,9 @@ class ImagenController extends Controller
             }
             return response()->json($response,$response['status']);
         }
+
         public function update(Request $request, $id) {
             $imagen = Imagen::find($id);
-            
             if (!$imagen) {
                 $response = [
                     'status' => 404,
@@ -138,68 +105,70 @@ class ImagenController extends Controller
                 ];
                 return response()->json($response, $response['status']);
             }
-            
-            // Verificar si hay una imagen cargada en la solicitud
-            if ($request->hasFile('imagen')) {
-                $image = $request->file('imagen');
         
-                // Verificar si el archivo cargado es una imagen válida
-                if ($image->isValid() && strpos($image->getMimeType(), 'image/') === 0) {
-                    // Los datos para actualizar pueden ser proporcionados a través de la entrada 'data'
-                    $data_input = $request->input('data', null);
-                    
-                    // Decodificar los datos de entrada si están presentes
-                    $data = $data_input ? json_decode($data_input, true) : [];
-                    $data = array_map('trim', $data);
-        
-                    // Definir las reglas de validación para los datos
-                    $rules = [
-                        'idPelicula' => 'exists:peliculas,id'
-                        // Agrega otras reglas de validación según sea necesario
-                    ];
-        
-                    // Validar los datos según las reglas definidas
-                    $validator = \Validator::make($data, $rules);
-        
-                    if (!$validator->fails()) {
-                        // Actualizar los campos de la imagen
-                        if (isset($data['idPelicula'])) { $imagen->idPelicula = $data['idPelicula']; }
-                        if (isset($data['descripcion'])) { $imagen->descripcion = $data['descripcion']; }
-        
-                        // Guardar la nueva imagen
-                        $imagen->imagen = base64_encode(file_get_contents($image)); 
-                        $imagen->save();
-        
-                        $response = [
-                            'status' => 200,
-                            'message' => 'Imagen actualizada',
-                            'imagen' => $imagen
-                        ];
-                    } else {
-                        // Los datos proporcionados no son válidos
-                        $response = [
-                            'status' => 406,
-                            'message' => 'Datos inválidos',
-                            'errors' => $validator->errors()
-                        ];
-                    }
-                } else {
-                    // El archivo cargado no es una imagen válida
-                    $response = [
-                        'status' => 400,
-                        'message' => 'El archivo no es una imagen válida'
-                    ];
-                }
-            } else {
-                // No se proporcionó ninguna nueva imagen para actualizar
+            $data_input = $request->input('data', null);
+            $file = $request->file('file');
+
+            if (!$data_input && !$file) {
                 $response = [
                     'status' => 400,
-                    'message' => 'No se proporcionó ninguna imagen para actualizar'
+                    'message' => 'No se proporcionaron datos ni archivo para actualizar'
                 ];
+                return response()->json($response, $response['status']);
             }
+            if ($data_input) {
+                $data = json_decode($data_input, true);
+                $data = array_map('trim', $data);
+                $isValid = \Validator::make($data, [
+                    'idPelicula' => 'exists:peliculas,id'
+                ]);
+                if ($isValid->fails()) {
+                    $response = [
+                        'status' => 406,
+                        'message' => 'Datos inválidos',
+                        'errors' => $isValid->errors()
+                    ];
+                    return response()->json($response, $response['status']);
+                }
+                $imagen->idPelicula = isset($data['idPelicula']) ? $data['idPelicula'] : $imagen->idPelicula;
+                $imagen->descripcion = isset($data['descripcion']) ? $data['descripcion'] : $imagen->descripcion;
+            }
+        
+            if ($file) {
+                \Storage::disk('peliculas')->put($imagen->imagen, \File::get($file));
+            }
+            $imagen->save();
+        
+            $response = [
+                'status' => 200,
+                'message' => 'Imagen actualizada',
+                'imagen' => $imagen
+            ];
             
             return response()->json($response, $response['status']);
         }
         
+        public function show($filename){
+        if(isset($filename)){
+            $exist=\Storage::disk('peliculas')->exists($filename);
+            if($exist){
+                $file=\Storage::disk('peliculas')->get($filename);
+                return new Response($file,200);
+            }else{
+                $response=array(
+                    'status'=>404,
+                    'message'=>'Imagen no existe'
+                );
+            }
+        } 
+        else{
+            $response=array(
+                'status'=>406,
+                'message'=>'No se definió el nombre de la imagen'
+            );
+        }
+        return response()->json($response, $response['status']);
+        
+        }
     
 }
