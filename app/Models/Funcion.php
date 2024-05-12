@@ -16,9 +16,6 @@ class Funcion extends Model
     ];
     protected $fillable=['fecha','horaInicio','horaFinal', 'precio'];
 
-    public function salas(){
-        return $this->belongsTo(Sala::class,'idSala');
-    }
 
     public function peliculas(){
         return $this->belongsTo(Pelicula::class,'idPelicula');
@@ -32,6 +29,5 @@ class Funcion extends Model
         return $this->hasMany(FuncionAsiento::class,'idFuncion');
     }
 
-    public static function getSalas(){return self::$salas;}
 
 }
