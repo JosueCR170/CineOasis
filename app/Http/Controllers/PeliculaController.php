@@ -110,8 +110,16 @@ class PeliculaController extends Controller
 
         public function destroy($id){
             if(isset($id)){
+                $pelicula=Pelicula::find($id);
+                $imagenes = $pelicula->imagenes;
+                    foreach ($imagenes as $imagen) {
+                        $filename= $imagen->imagen;
+                        \Storage::disk('peliculas')->delete($filename);
+                    }
+                    
                 $delete=Pelicula::where('id',$id)->delete();
                 if($delete){
+                    
                     $response=array(
                         'status'=>200,
                         'menssage'=>'pelicula eliminada',
