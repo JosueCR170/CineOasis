@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Pelicula;
 use App\Enums\ServerStatus;
 use Illuminate\Validation\Rule;
+use App\Helpers\JwtAuth;
 
 class PeliculaController extends Controller
 {
@@ -27,6 +28,18 @@ class PeliculaController extends Controller
      * Metodo POST para crear un registro
      */
     public function store(Request $request){
+
+        $jwt=new JwtAuth();
+       if(!$jwt->checkToken($request->header('bearertoken'),true)->permisoAdmin){
+        $response = array(
+            'status'=>406,
+            'menssage'=>'No tienes permiso de administrador'
+           
+        );
+        return response()->json($response,$response['status']);
+       }
+       else{
+
         $data_input = $request->input('data',null);
         if($data_input){
             $data = json_decode($data_input,true);
@@ -84,6 +97,8 @@ class PeliculaController extends Controller
                 'menssage'=>'No se encontro el objeto data'
             );
         }
+
+    }
         return response()->json($response,$response['status']);
     }
 
@@ -116,7 +131,7 @@ class PeliculaController extends Controller
                         $filename= $imagen->imagen;
                         \Storage::disk('peliculas')->delete($filename);
                     }
-                    
+
                 $delete=Pelicula::where('id',$id)->delete();
                 if($delete){
                     

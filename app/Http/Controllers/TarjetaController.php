@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JwtAuth;
 use Illuminate\Http\Request;
 use App\Models\Tarjeta;
 
@@ -26,7 +27,6 @@ class TarjetaController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idUsuario'=>'required|numeric|exists:users,id',
                 'numero'=>'required|numeric|unique:tarjetas,numero',
                 'fechaVencimiento'=>'required|date',
                 'codigo'=>'required|numeric'
@@ -34,7 +34,8 @@ class TarjetaController extends Controller
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
                 $tarjeta=new Tarjeta();
-                $tarjeta->idUsuario=$data['idUsuario'];
+                $jwt=new JwtAuth();
+                $tarjeta->idUsuario=$jwt->checkToken($request->header('bearertoken'),true)->iss;
                 $tarjeta->numero=$data['numero'];
                 $tarjeta->fechaVencimiento=$data['fechaVencimiento'];
                 $tarjeta->codigo=$data['codigo'];
@@ -126,7 +127,7 @@ class TarjetaController extends Controller
         }
     
         $rules = [
-            'idUsuario'=>'numeric|exists:users,id',
+    
             'numero'=>'numeric|unique:tarjetas,numero',
             'fechaVencimiento'=>'date',
             'codigo'=>'numeric'
