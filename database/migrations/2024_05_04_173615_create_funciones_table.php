@@ -13,16 +13,12 @@ return new class extends Migration
     {
         Schema::create('funciones', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('idSala')
-             ->constrained('salas')
-             ->nullable()
-             ->cascadeOnUpdate()
-             ->cascadeOnDelete();
              $table->foreignId('idPelicula')
              ->constrained('peliculas')
              ->nullable()
              ->cascadeOnUpdate()
              ->cascadeOnDelete();
+             $table->string("sala");
             $table->date("fecha");
             $table->time("horaInicio");
             $table->time("horaFinal");

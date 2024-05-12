@@ -10,6 +10,10 @@ class Funcion extends Model
     use HasFactory;
 
     protected $table='funciones';
+
+    protected static $salas=[
+        'A','B','C','D','E'
+    ];
     protected $fillable=['fecha','horaInicio','horaFinal', 'precio'];
 
     public function salas(){
@@ -24,6 +28,10 @@ class Funcion extends Model
         return $this->hasMany(Ticket::class,'idFuncion');
     }
 
+    public function funcionAsientos(){
+        return $this->hasMany(FuncionAsiento::class,'idFuncion');
+    }
 
+    public static function getSalas(){return self::$salas;}
 
 }

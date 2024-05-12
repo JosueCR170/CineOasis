@@ -13,7 +13,19 @@ return new class extends Migration
     {
         Schema::create('detalles_ticket', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('idTicket')
+            ->constrained('tickets')
+            ->nullable()
+            ->cascadeOnUpdate()
+            ->cascadeOnDelete();
+
+            $table->foreignId('idAsiento')
+            ->constrained('asientos')
+            ->nullable()
+            ->cascadeOnUpdate()
+            ->cascadeOnDelete();
+            $table->float('subtotal');
+            
         });
     }
 

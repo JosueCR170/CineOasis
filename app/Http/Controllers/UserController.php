@@ -8,8 +8,16 @@ use App\Helpers\JwtAuth;
 
 class UserController extends Controller
 {
-    public function index()//listo
+    public function index(Request $request)//listo
     {
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+
+            );
+        } else {
         $data=User::all();
         $data = User::with('tarjetas')->get();
         $response=array(
@@ -17,6 +25,7 @@ class UserController extends Controller
             "message"=>"Todos los registros de los usuarios",
             "data"=>$data
         );
+    }
         return response()->json($response,200);
     }
 

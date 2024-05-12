@@ -27,25 +27,25 @@ Route::prefix('v1')->group(
         
         //POST
         Route::post('/user/login',[UserController::class,'login']);//listo
-        Route::post('/user/getIdentity',[UserController::class,'getIdentity'])->middleware(ApiAuthMiddleware::class);//listo
         Route::post('/user',[UserController::class,'store']);//listo
-        Route::post('/asiento',[AsientoController::class,'store'])->middleware(ApiAuthMiddleware::class);//listo
-        Route::post('/pelicula',[PeliculaController::class,'store'])->middleware(ApiAuthMiddleware::class);
-        Route::post('/asiento/rellenar',[AsientoController::class,'rellenar'])->middleware(ApiAuthMiddleware::class);//listo (Actualizar)
-        Route::post('/comida',[ComidaController::class,'store'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::post('/asiento',[AsientoController::class,'store'])->middleware(ApiAuthMiddleware::class);
+        Route::post('/pelicula',[PeliculaController::class,'store'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::post('/asiento/rellenar',[AsientoController::class,'rellenar'])->middleware(ApiAuthMiddleware::class);// (Actualizar)
+        Route::post('/comida',[ComidaController::class,'store'])->middleware(ApiAuthMiddleware::class);
         Route::post('/imagen',[ImagenController::class,'store'])->middleware(ApiAuthMiddleware::class);
         //show
-        Route::get('/comida/{id}', [ComidaController::class, 'show']);//listo
-        Route::get('/asiento/{id}', [AsientoController::class, 'show']);//listo
-        Route::get('/pelicula/{id}', [PeliculaController::class, 'show']);
-        Route::get('/user/{id}', [UserController::class, 'show'])->middleware(ApiAuthMiddleware::class);
+        Route::get('/user/getIdentity',[UserController::class,'getIdentity'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::get('/comida/{id}', [ComidaController::class, 'show']);
+        Route::get('/asiento/{id}', [AsientoController::class, 'show']);
+        Route::get('/pelicula/{id}', [PeliculaController::class, 'show']);//listo
+        Route::get('/user/{id}', [UserController::class, 'show'])->middleware(ApiAuthMiddleware::class);//listo
         Route::get('/imagen/{nombre}', [ImagenController::class, 'show']);
         //GET
         Route::get('/user',[UserController::class, 'index'])->middleware(ApiAuthMiddleware::class);
-        Route::get('/comida',[ComidaController::class, 'index']);//listo
+        Route::get('/comida',[ComidaController::class, 'index']);//
         Route::get('/pelicula', [PeliculaController::class, 'index']);
         Route::get('/funcion',[FuncionController::class,'index']);
-        Route::get('/asiento',[AsientoController::class,'index']);//listo
+        Route::get('/asiento',[AsientoController::class,'index']);//
         Route::get('/imagen', [ImagenController::class, 'index']);
         //put
         Route::put('/user/{id}', [UserController::class, 'update'])->middleware(ApiAuthMiddleware::class);//listo

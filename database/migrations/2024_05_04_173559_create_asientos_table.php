@@ -13,15 +13,13 @@ return new class extends Migration
     {
         Schema::create('asientos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('idSala')
-             ->constrained('salas')
+            $table->foreignId('idFuncionAsiento')
+             ->constrained('FuncionAsiento')
              ->nullable()
              ->cascadeOnUpdate()
              ->cascadeOnDelete();
             $table->integer("numero");
             $table->string("fila");
-            $table->boolean("estado");
-            $table->timestamps();
         });
     }
 
