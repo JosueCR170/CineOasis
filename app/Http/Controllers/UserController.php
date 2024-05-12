@@ -20,50 +20,59 @@ class UserController extends Controller
         return response()->json($response,200);
     }
 
-    public function store(Request $request){//listo
-        $data_input=$request->input('data',null);
-        if($data_input){
-            $data=json_decode($data_input,true);
-            $data=array_map('trim',$data);
-            $rules=[
-                'name'=>'required|alpha|max:30',
-                'apellido'=>'required|alpha|max:40',
-                'email'=>'required|email|unique:users,email',
-                'password'=>'required|alpha_dash',
-                'fechaNacimiento'=>'required|date',
-                'permisoAdmin'=>'required|boolean'
-            ];
-            $isValid=\validator($data,$rules);
-            if(!$isValid->fails()){
-                $user=new User();
-                $user->name=$data['name'];
-                $user->apellido=$data['apellido'];
-                $user->email=$data['email'];
-                $user->password=hash('sha256',$data['password']);
-                $user->fechaNacimiento=$data['fechaNacimiento'];
-                $user->permisoAdmin=$data['permisoAdmin'];
-                $user->save();
-                $response=array(
-                    'status'=>201,
-                    'message'=>'usuario creado',
-                    'user'=>$user
-                );
-            }else{
-                $response=array(
-                    'status'=>406,
-                    'message'=>'Datos inválidos',
-                    'error'=>$isValid->errors()
-                );
+    public function store(Request $request)
+    {
+        $data_input = $request->input('data', null);
+        if ($data_input) {
+            $data = json_decode($data_input, true);
+            if ($data !== null) {
+                $data = array_map('trim', $data);
+                $rules = [
+                    'name' => 'required|alpha|max:30',
+                    'apellido' => 'required|alpha|max:40',
+                    'email' => 'required|email|unique:users,email',
+                    'password' => 'required|alpha_dash',
+                    'fechaNacimiento' => 'required|date',
+                    'permisoAdmin' => 'required|boolean'
+                ];
+                $validator = validator($data, $rules);
+                if (!$validator->fails()) {
+                    $user = new User();
+                    $user->name = $data['name'];
+                    $user->apellido = $data['apellido'];
+                    $user->email = $data['email'];
+                    $user->password = hash('sha256', $data['password']);
+                    $user->fechaNacimiento = $data['fechaNacimiento'];
+                    $user->permisoAdmin = $data['permisoAdmin'];
+                    $user->save();
+                    $response = [
+                        'status' => 201,
+                        'message' => 'Usuario creado exitosamente',
+                        'user' => $user
+                    ];
+                } else {
+                    $response = [
+                        'status' => 406,
+                        'message' => 'Datos inválidos',
+                        'error' => $validator->errors()
+                    ];
+                }
+            } else {
+                $response = [
+                    'status' => 400,
+                    'message' => 'No se proporcionaron datos válidos',
+                ];
             }
-        }else{
-            $response=array(
-                'status'=>400,
-                'message'=>'No se encontró el objeto data'
-            );
+        } else {
+            $response = [
+                'status' => 400,
+                'message' => 'No se encontró el objeto de datos (data)'
+            ];
         }
-        return response()->json($response,$response['status']);
+    
+        // Devolver la respuesta JSON
+        return response()->json($response, $response['status']);
     }
-
     
     public function show($id){//listo
         $data=User::find($id);

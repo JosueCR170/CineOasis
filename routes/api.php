@@ -24,51 +24,45 @@ use App\Http\Middleware\ApiAuthMiddleware;
 Route::prefix('v1')->group(
     function(){
         //RUTAS ESPECIFICAS
-        Route::post('/rellenar',[AsientoController::class,'rellenar']);
+        
         //POST
-        Route::post('/user/login',[UserController::class,'login']);
+        Route::post('/user/login',[UserController::class,'login']);//listo
+        Route::post('/user/getIdentity',[UserController::class,'getIdentity'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::post('/user',[UserController::class,'store']);//listo
+        Route::post('/asiento',[AsientoController::class,'store'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::post('/pelicula',[PeliculaController::class,'store'])->middleware(ApiAuthMiddleware::class);
+        Route::post('/asiento/rellenar',[AsientoController::class,'rellenar'])->middleware(ApiAuthMiddleware::class);//listo (Actualizar)
+        Route::post('/comida',[ComidaController::class,'store'])->middleware(ApiAuthMiddleware::class);//listo
+        //show
+        Route::post('/comida/{id}', [ComidaController::class, 'show']);//listo
+        Route::post('/asiento/{id}', [AsientoController::class, 'show']);//listo
+        Route::post('/pelicula/{id}', [PeliculaController::class, 'show']);   
         Route::post('/user/{id}', [UserController::class, 'show'])->middleware(ApiAuthMiddleware::class);
-        Route::post('/user/getIdentity',[UserController::class,'getIdentity'])->middleware(ApiAuthMiddleware::class);
-
-
-        Route::post('/user/store',[UserController::class,'store']);
-
-
-        Route::post('/comida/store',[ComidaController::class,'store'])->middleware(ApiAuthMiddleware::class);
-        Route::post('/comida/{id}', [ComidaController::class, 'show']);
-
         //GET
         Route::get('/user',[UserController::class, 'index'])->middleware(ApiAuthMiddleware::class);
-        Route::get('/comida',[ComidaController::class, 'index']);
+        Route::get('/comida',[ComidaController::class, 'index']);//listo
         Route::get('/pelicula', [PeliculaController::class, 'index']);
         Route::get('/funcion',[FuncionController::class,'index']);
-
+        Route::get('/asiento',[AsientoController::class,'index']);//listo
         //put
-        Route::put('/user/{id}', [UserController::class, 'update'])->middleware(ApiAuthMiddleware::class);
-        Route::put('/comida/{id}', [ComidaController::class, 'update'])->middleware(ApiAuthMiddleware::class);
-
+        Route::put('/user/{id}', [UserController::class, 'update'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::put('/comida/{id}', [ComidaController::class, 'update'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::put('/asiento/{id}', [AsientoController::class, 'update'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::put('/funcion/{id}',[FuncionController::class,'update'])->middleware(ApiAuthMiddleware::class);
+        Route::put('/pelicula/{id}', [PeliculaController::class, 'update'])->middleware(ApiAuthMiddleware::class);
         //delete
-        Route::delete('/user/{id}', [UserController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);
-        Route::delete('/comida/{id}', [ComidaController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);
-
-
-
+        Route::delete('/user/{id}', [UserController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::delete('/comida/{id}', [ComidaController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::delete('/asiento/{id}', [AsientoController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::delete('/funcion/{id}',[FuncionController::class,'destroy'])->middleware(ApiAuthMiddleware::class);
+        Route::delete('/pelicula/{id}', [PeliculaController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);
         //resource
-        Route::resource('/Tarjeta',PeliculaController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);//listo
+        Route::resource('/Tarjeta',PeliculaController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
         Route::resource('/ticket',TicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
         Route::resource('/detalles_ticket',DetallesTicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
-        Route::resource('/sala',SalaController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
-      //  Route::resource('/user',UserController::class,['except'=>['create','edit']]);
-       
-       
-        Route::resource('/pelicula',PeliculaController::class,['except'=>['create','edit']]);
-        Route::resource('/imagen',ImagenController::class,['except'=>['create','edit']]);
-       
-        Route::resource('/asiento',AsientoController::class,['except'=>['create','edit']]);
-        Route::resource('/funcion',FuncionController::class,['except'=>['create','edit']]);
-
-       Route::resource('/comida',ComidaController::class,['except'=>['create','edit']]);
-        Route::resource('/combo',DetallesComboController::class,['except'=>['create','edit']]);
+        Route::resource('/sala',SalaController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);//listo
+        Route::resource('/combo',DetallesComboController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class); 
+        
 
     }
 );
