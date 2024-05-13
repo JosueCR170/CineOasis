@@ -31,9 +31,7 @@ class ImagenController extends Controller
             $response = array(
                 'status' => 406,
                 'menssage' => 'No tienes permiso de administrador'
-
             );
-            return response()->json($response, $response['status']);
         } else {
 
             $data_input = $request->input('data', null);
@@ -91,7 +89,7 @@ class ImagenController extends Controller
                 'menssage' => 'No tienes permiso de administrador'
 
             );
-            return response()->json($response, $response['status']);
+           
         } else {
 
         if (isset($id)) {
@@ -130,7 +128,7 @@ class ImagenController extends Controller
                 'menssage' => 'No tienes permiso de administrador'
 
             );
-            return response()->json($response, $response['status']);
+           
         } else {
         $imagen = Imagen::find($id);
         if (!$imagen) {

@@ -36,7 +36,6 @@ class PeliculaController extends Controller
             'menssage'=>'No tienes permiso de administrador'
            
         );
-        return response()->json($response,$response['status']);
        }
        else{
 
@@ -132,7 +131,7 @@ class PeliculaController extends Controller
                  'menssage'=>'No tienes permiso de administrador'
                 
              );
-             return response()->json($response,$response['status']);
+           
             }
             else{
 
@@ -177,7 +176,7 @@ class PeliculaController extends Controller
              'menssage'=>'No tienes permiso de administrador'
             
          );
-         return response()->json($response,$response['status']);
+        
         }
         else{
 

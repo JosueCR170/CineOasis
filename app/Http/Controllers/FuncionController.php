@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Funcion;
 use Illuminate\Validation\Rule;
+use App\Helpers\JwtAuth;
 
 class FuncionController extends Controller
 {
@@ -23,6 +24,13 @@ class FuncionController extends Controller
     }
 
     public function store(Request $request){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $data_input=$request->input('data',null);
         if($data_input){
             $data=json_decode($data_input,true);
@@ -65,6 +73,7 @@ class FuncionController extends Controller
                 'message'=>'No se encontró el objeto data'
             );
         }
+    }
         return response()->json($response,$response['status']);
     }
 
@@ -88,7 +97,14 @@ class FuncionController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request, $id){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         if(isset($id)){
             $deleted=Funcion::where('id',$id)->delete();
             if($deleted)
@@ -109,11 +125,19 @@ class FuncionController extends Controller
                 'message'=>'Falta el identificador del recurso a eliminar'
             );
         }
+    }
         return response()->json($response,$response['status']);
     }
 
     //patch
     public function update(Request $request, $id) {
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $funcion = Funcion::find($id);
     
         if (!$funcion) {
@@ -170,7 +194,7 @@ class FuncionController extends Controller
             'message' => 'Funcion actualizada',
             'funcion' => $funcion
         ];
-    
+        }
         return response()->json($response, $response['status']);
     }
 }

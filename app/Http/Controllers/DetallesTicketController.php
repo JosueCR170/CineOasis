@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\DetallesTicket;
+use App\Helpers\JwtAuth;
 
 class DetallesTicketController extends Controller
 {
@@ -77,7 +78,14 @@ class DetallesTicketController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request, $id){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         if(isset($id)){
             $deleted=DetallesTicket::where('id',$id)->delete();
             if($deleted)
@@ -98,10 +106,18 @@ class DetallesTicketController extends Controller
                 'message'=>'Falta el identificador del detallesTicket a eliminar'
             );
         }
+        }
         return response()->json($response,$response['status']);
     }
 
     public function update(Request $request, $id) {
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $detallesTicket = DetallesTicket::find($id);
     
         if (!$detallesTicket) {
@@ -151,7 +167,7 @@ class DetallesTicketController extends Controller
             'message' => 'detallesTicket actualizado',
             'detallesTicket' => $detallesTicket
         ];
-    
+        }
         return response()->json($response, $response['status']);
     }
 }

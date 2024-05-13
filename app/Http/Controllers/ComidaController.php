@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Comida;
+use App\Helpers\JwtAuth;
 
 class ComidaController extends Controller
 {
@@ -20,6 +21,13 @@ class ComidaController extends Controller
     }
 
     public function store(Request $request){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $data_input=$request->input('data',null);
         if($data_input){
             $data=json_decode($data_input,true);
@@ -52,6 +60,7 @@ class ComidaController extends Controller
                 'message'=>'No se encontró el objeto data'
             );
         }
+        }
         return response()->json($response,$response['status']);
     }
 
@@ -73,7 +82,14 @@ class ComidaController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request,$id){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         if(isset($id)){
             $deleted=Comida::where('id',$id)->delete();
             if($deleted)
@@ -93,12 +109,19 @@ class ComidaController extends Controller
                 'status'=>406,
                 'message'=>'Falta el identificador del recurso a eliminar'
             );
-        }
+        }}
         return response()->json($response,$response['status']);
     }
 
     //patch
     public function update(Request $request, $id) {
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $comida = Comida::find($id);
     
         if (!$comida) {
@@ -146,7 +169,7 @@ class ComidaController extends Controller
             'message' => 'Comida actualizada',
             'Comida' => $comida
         ];
-    
+        }
         return response()->json($response, $response['status']);
     }
 }

@@ -87,7 +87,14 @@ class TicketController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request, $id){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         if(isset($id)){
             $deleted=Ticket::where('id',$id)->delete();
             if($deleted)
@@ -108,10 +115,18 @@ class TicketController extends Controller
                 'message'=>'Falta el identificador del recurso a eliminar'
             );
         }
+    }
         return response()->json($response,$response['status']);
     }
 
     public function update(Request $request, $id) {
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $ticket = Ticket::find($id);
     
         if (!$ticket) {
@@ -158,7 +173,7 @@ class TicketController extends Controller
             'message' => 'ticket actualizado',
             'ticket' => $ticket
         ];
-    
+        }
         return response()->json($response, $response['status']);
     }
 }

@@ -6,13 +6,13 @@ use App\Http\Controllers\TarjetaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PeliculaController;
 use App\Http\Controllers\ImagenController;
-use App\Http\Controllers\SalaController;
 use App\Http\Controllers\AsientoController;
 use App\Http\Controllers\FuncionController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\DetallesTicketController;
 use App\Http\Controllers\ComidaController;
 use App\Http\Controllers\DetallesComboController;
+use App\Http\Controllers\FuncionAsientoController;
 
 
 use App\Http\Middleware\ApiAuthMiddleware;
@@ -65,8 +65,8 @@ Route::prefix('v1')->group(
         Route::resource('/tarjeta',TarjetaController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class); //Listo
         Route::resource('/ticket',TicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
         Route::resource('/detalles_ticket',DetallesTicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
-        Route::resource('/sala',SalaController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);//listo
         Route::resource('/combo',DetallesComboController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class); 
+        Route::resource('/funcionAsiento',FuncionAsientoController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class); 
         
 
     }
