@@ -19,7 +19,6 @@ class UserController extends Controller
             );
         } else {
         $data=User::all();
-        $data = User::with('tarjetas')->get();
         $response=array(
             "status"=>200,
             "message"=>"Todos los registros de los usuarios",
@@ -86,7 +85,6 @@ class UserController extends Controller
     public function show($id){//listo
         $data=User::find($id);
         if(is_object($data)){
-            $data=$data->load('tarjetas');
             $response=array(
                 'status'=>200,
                 'message'=>'Datos del usuario',
@@ -169,7 +167,7 @@ class UserController extends Controller
         if(isset($data_input['name'])) { $user->name = $data_input['name']; }
         if(isset($data_input['apellido'])) { $user->apellido = $data_input['apellido']; }
         if(isset($data_input['email'])) { $user->email = $data_input['email']; }
-        if(isset($data_input['password'])) { $user->password = $data_input['password']; }
+        if(isset($data_input['password'])) { $user->password = hash('sha256', $data_input['password']); }
         if(isset($data_input['fechaNacimiento'])) { $user->fechaNacimiento = $data_input['fechaNacimiento']; }
         if(isset($data_input['permisoAdmin'])) { $user->permisoAdmin = $data_input['permisoAdmin']; }
 
@@ -188,12 +186,11 @@ class UserController extends Controller
         $data_input = $request->input('data', null);
         $data = json_decode($data_input, true);
     
-        // Verificar si $data es null o no antes de usar array_map()
+       
         if ($data !== null) {
             $data = array_map('trim', $data);
         } else {
-            // Manejar el caso en que $data es null
-            // Por ejemplo, puedes devolver un error de JSON
+            
             $response = array(
                 'status' => 400,
                 'message' => 'No se proporcionaron datos válidos',

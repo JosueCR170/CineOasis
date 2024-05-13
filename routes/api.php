@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TarjetaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PeliculaController;
 use App\Http\Controllers\ImagenController;
@@ -62,7 +61,6 @@ Route::prefix('v1')->group(
         Route::delete('/pelicula/{id}', [PeliculaController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);
         Route::delete('/imagen/{id}', [ImagenController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);
         //resource
-        Route::resource('/tarjeta',TarjetaController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class); //Listo
         Route::resource('/ticket',TicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
         Route::resource('/detalles_ticket',DetallesTicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
         Route::resource('/combo',DetallesComboController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class); 
