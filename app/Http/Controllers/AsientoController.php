@@ -27,30 +27,14 @@ class AsientoController extends Controller
             $rules = [
                 'numero' => 'required|integer',
                 'fila' => 'required|string',
-                'estado' => 'required|boolean'
             ];
             $isValid = validator($data, $rules);
             if (!$isValid->fails()) {
-                // Obtener la capacidad de la sala
-                $sala = Sala::findOrFail($data['idSala']);
-                $capacidad_actual = Asiento::where('idSala', $sala->id)->count();
-                $capacidad_maxima = $sala->capacidad;
-    
-                // Verificar si la capacidad máxima ha sido alcanzada
-                if ($capacidad_actual >= $capacidad_maxima) {
-                    $response = [
-                        'status' => 400,
-                        'message' => 'La capacidad máxima de la sala ya ha sido alcanzada. No se pueden ingresar más asientos.'
-                    ];
-                    return response()->json($response, $response['status']);
-                }
     
                 // Crear el asiento
                 $asiento = new Asiento();
-                $asiento->idSala = $data['idSala'];
                 $asiento->numero = $data['numero'];
                 $asiento->fila = $data['fila'];
-                $asiento->estado = $data['estado'] ? 1 : 0;
                 $asiento->save();
     
                 $response = [
@@ -74,43 +58,26 @@ class AsientoController extends Controller
         return response()->json($response, $response['status']);
     }
 
-    //Sacada de chat 
     public function rellenar(Request $request){
         $data_input = $request->input('data', null);
         if ($data_input) {
             $data = json_decode($data_input, true);
             $data = array_map('trim', $data);
             $rules = [
-                'idSala' => 'required|exists:salas,id',
+                'cantidad' => 'integer|required',
             ];
             $isValid = validator($data, $rules);
             if (!$isValid->fails()) {
-                // Obtener la capacidad de la sala
-                $sala = Sala::findOrFail($data['idSala']);
-                $capacidad_actual = Asiento::where('idSala', $sala->id)->count();
-                $capacidad_maxima = $sala->capacidad;
-    
-                // Verificar si la capacidad máxima ha sido alcanzada
-                if ($capacidad_actual >= $capacidad_maxima) {
-                    $response = [
-                        'status' => 400,
-                        'message' => 'La capacidad máxima de la sala ya ha sido alcanzada. No se pueden ingresar más asientos.'
-                    ];
-                    return response()->json($response, $response['status']);
-                }
+                $cantidad = $data['cantidad']; 
     
                 // Crear los asientos restantes
-                for ($i = $capacidad_actual + 1; $i <= $capacidad_maxima; $i++) {
-                     // $fila = 'F' . chr(64 + ceil($i / 10)); // Calcula la letra de la fila
-                    $fila = 'F' . $i;
+                for ($i = 1; $i <= $cantidad; $i++) { 
                     $asiento = new Asiento();
-                    $asiento->idSala = $data['idSala'];
-                     //$numero = $i % 10 == 0 ? 10 : $i % 10; // Calcula el número de asiento
-                    $asiento->numero = $i;
+                    $asiento->numero = $i % 10 == 0 ? 10 : $i % 10; 
+                    $fila = 'F' . chr(64 + ceil($i / 10)); // Calcula la letra de la fila
                     $asiento->fila = $fila;
-                    $asiento->estado = 1; 
                     $asiento->save();
-                }
+                }         
     
                 $response = [
                     'status' => 201,
@@ -131,6 +98,7 @@ class AsientoController extends Controller
         }
         return response()->json($response, $response['status']);
     }
+    
     
     
     
@@ -199,10 +167,8 @@ class AsientoController extends Controller
         }
     
         $rules = [
-            'idSala'=>'exists:salas,id',
             'numero'=>'integer',
             'fila'=>'string',
-            'estado'=>'boolean'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -215,10 +181,9 @@ class AsientoController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-        if(isset($data_input['idSala'])) { $asiento->idSala = $data_input['idSala']; }
+       
         if(isset($data_input['numero'])) { $asiento->numero = $data_input['numero']; }
         if(isset($data_input['fila'])) { $asiento->fila = $data_input['fila']; }
-        if(isset($data_input['estado'])) { $asiento->estado = $data_input['estado'] ? 1 : 0; }
 
         $asiento->save();
     
@@ -230,7 +195,5 @@ class AsientoController extends Controller
     
         return response()->json($response, $response['status']);
     }
-
-
 
 }

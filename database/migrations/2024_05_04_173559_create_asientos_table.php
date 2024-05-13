@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer("numero");
             $table->string("fila");
+            $table->timestamps();
         });
     }
 

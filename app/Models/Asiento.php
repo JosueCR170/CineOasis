@@ -10,7 +10,6 @@ class Asiento extends Model
     use HasFactory;
     
     protected $table='asientos';
-    protected $fillable=['numero','fila','estado'];
 
 
     public function detallesTicket(){
