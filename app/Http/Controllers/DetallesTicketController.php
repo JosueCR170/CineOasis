@@ -11,7 +11,7 @@ class DetallesTicketController extends Controller
     public function index()
     {
         $data=DetallesTicket::all();
-        $data=$data->load('asientos');
+        $data=$data->load('asiento');
         $response=array(
             "status"=>200,
             "message"=>"Todos los registros de los detalles de tickets",
@@ -28,9 +28,7 @@ class DetallesTicketController extends Controller
             $rules=[
                 'idTicket'=>'required|exists:tickets, id',
                 'idAsiento'=>'required|exists:asientos, id',
-                'subtotal'=>'required|decimal:0,4',
-                'descuento'=>'decimal:0,4',
-                'impuesto'=>'decimal:0,4'
+                'subtotal'=>'required|decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
@@ -38,13 +36,11 @@ class DetallesTicketController extends Controller
                 $detallesTicket->idTicket=$data['idTicket'];
                 $detallesTicket->idAsiento=$data['idAsiento'];
                 $detallesTicket->subtotal=$data['subtotal'];
-                $detallesTicket->descuento=$data['descuento'];
-                $detallesTicket->impuesto=$data['impuesto'];
                 $detallesTicket->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'detallesTicket creada',
-                    'Comida'=>$detallesTicket
+                    'message'=>'detallesTicket creado',
+                    'detallesTicket'=>$detallesTicket
                 );
             }else{
                 $response=array(
@@ -66,7 +62,7 @@ class DetallesTicketController extends Controller
     public function show($id){
         $data=DetallesTicket::find($id);
         if(is_object($data)){
-            $data=$data->load('asientos');
+            $data=$data->load('asiento');
             $response=array(
                 'status'=>200,
                 'message'=>'Datos de los detalles ticket',
@@ -105,7 +101,6 @@ class DetallesTicketController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    //patch
     public function update(Request $request, $id) {
         $detallesTicket = DetallesTicket::find($id);
     
@@ -131,9 +126,7 @@ class DetallesTicketController extends Controller
         $rules = [
             'idTicket'=>'exists:tickets, id',
             'idAsiento'=>'exists:asientos, id',
-            'subtotal'=>'decimal:0,4',
-            'descuento'=>'decimal:0,4',
-            'impuesto'=>'decimal:0,4'
+            'subtotal'=>'decimal:0,4'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -150,8 +143,6 @@ class DetallesTicketController extends Controller
         if(isset($data_input['idTicket'])) { $detallesTicket->idTicket = $data_input['idTicket']; }
         if(isset($data_input['idAsiento'])) { $detallesTicket->idAsiento = $data_input['idAsiento']; }
         if(isset($data_input['subtotal'])) { $detallesTicket->subtotal = $data_input['subtotal']; }
-        if(isset($data_input['descuento'])) { $detallesTicket->descuento = $data_input['descuento']; }
-        if(isset($data_input['impuesto'])) { $detallesTicket->impuesto = $data_input['impuesto']; }
         
         $detallesTicket->save();
     

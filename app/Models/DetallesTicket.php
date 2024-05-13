@@ -10,11 +10,11 @@ class DetallesTicket extends Model
     use HasFactory;
     protected $table='detalles_ticket';
 
-    public function asientos(){
+    public function asiento(){
         return $this->belongsTo(Asiento::class,'idAsiento');
     }
 
-    public function tickets(){
+    public function ticket(){
         return $this->belongsTo(Ticket::class,'idTicket');
     }
 }
