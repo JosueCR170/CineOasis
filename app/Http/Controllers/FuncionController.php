@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Funcion;
+use Illuminate\Validation\Rule;
 
 class FuncionController extends Controller
 {
@@ -12,7 +13,7 @@ class FuncionController extends Controller
     {
         $data=Funcion::all();
         $data=$data->load('peliculas');
-        $data=$data->load('salas');
+        $data=$data->load('funcionAsientos');
         $response=array(
             "status"=>200,
             "message"=>"Todos los registros de las funciones",
@@ -26,9 +27,11 @@ class FuncionController extends Controller
         if($data_input){
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
+
+            $salas = Funcion::getSalas();
             $rules=[
                 'idPelicula'=>'required|exists:peliculas,id',
-                'idSala'=> 'required|exists:salas,id',
+                'sala' => ['required', Rule::in($salas)],
                 'fecha'=>'required|date',
                 'horaInicio'=>'required|date_format:H:i:s',
                 'horaFinal'=>'required|date_format:H:i:s',
@@ -38,7 +41,7 @@ class FuncionController extends Controller
             if(!$isValid->fails()){
                 $funcion=new Funcion();
                 $funcion->idPelicula=$data['idPelicula'];
-                $funcion->idSala=$data['idSala'];
+                $funcion->sala=$data['sala'];
                 $funcion->fecha=$data['fecha'];
                 $funcion->horaInicio=$data['horaInicio'];
                 $funcion->horaFinal=$data['horaFinal'];
@@ -70,7 +73,7 @@ class FuncionController extends Controller
         $data=Funcion::find($id);
         if(is_object($data)){
             $data=$data->load('peliculas');
-            $data=$data->load('salas');
+            $data=$data->load('funcionAsientos');
             $response=array(
                 'status'=>200,
                 'message'=>'Datos de la funcion',
@@ -131,10 +134,10 @@ class FuncionController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-    
+        $salas = Funcion::getSalas();
         $rules = [
             'idPelicula'=>'exists:peliculas,id',
-            'idSala'=> 'exists:salas,id',
+            'sala' => Rule::in($salas),
             'fecha'=>'date',
             'horaInicio'=>'date_format:H:i:s',
             'horaFinal'=>'date_format:H:i:s',
@@ -153,7 +156,7 @@ class FuncionController extends Controller
         }
     
         if(isset($data_input['idPelicula'])) { $funcion->idPelicula = $data_input['idPelicula']; }
-        if(isset($data_input['idSala'])) { $funcion->idSala = $data_input['idSala']; }
+        if(isset($data_input['sala'])) { $funcion->sala = $data_input['sala']; }
 
         if(isset($data_input['fecha'])) { $funcion->fecha = $data_input['fecha']; }
         if(isset($data_input['horaInicio'])) { $funcion->horaInicio = $data_input['horaInicio']; }

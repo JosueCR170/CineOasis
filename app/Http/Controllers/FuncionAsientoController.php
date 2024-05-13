@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FuncionAsiento;
 use Illuminate\Http\Request;
-use App\Models\Sala;
 
-class SalaController extends Controller
+class FuncionAsientoController extends Controller
 {
     //
     public function index()
     {
-        $data=Sala::all();
-       $data=$data->load('asientos');
+        $data=FuncionAsiento::all();
+        $data=$data->load('asiento');
         $response=array(
             "status"=>200,
-            "message"=>"Todos los registros de las salas",
+            "message"=>"Todos los registros de los asientos en las funciones",
             "data"=>$data
         );
         return response()->json($response,200);
@@ -26,19 +26,21 @@ class SalaController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'nombreSala'=>'required|string',
-                'capacidad'=>'required|integer',
+                'idFuncion'=>'required|exists:funciones, id',
+                'idAsiento'=>'required|exists:asientos, id',
+                'estado'=>'required|boolean'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
-                $sala=new Sala();
-                $sala->nombreSala=$data['nombreSala'];
-                $sala->capacidad=$data['capacidad'];
-                $sala->save();
+                $funcionAsiento=new FuncionAsiento();
+                $funcionAsiento->idFuncion=$data['idFuncion'];
+                $funcionAsiento->idAsiento=$data['idAsiento'];
+                $funcionAsiento->estado=$data['estado'];
+                $funcionAsiento->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'Sala creada',
-                    'sala'=>$sala
+                    'message'=>'funcioAsiento creada',
+                    'funcionAsiento'=>$funcionAsiento
                 );
             }else{
                 $response=array(
@@ -58,13 +60,13 @@ class SalaController extends Controller
 
     
     public function show($id){
-        $data=Sala::find($id);
+        $data=FuncionAsiento::find($id);
         if(is_object($data)){
-            $data=$data->load('asientos');
+            $data=$data->load('asiento');
             $response=array(
                 'status'=>200,
-                'message'=>'Datos de la sala',
-                'sala'=>$data
+                'message'=>'Datos de funcion asiento',
+                'funcionAsiento'=>$data
             );
         }else{
             $response=array(
@@ -77,35 +79,36 @@ class SalaController extends Controller
 
     public function destroy($id){
         if(isset($id)){
-            $deleted=Sala::where('id',$id)->delete();
+            $deleted=FuncionAsiento::where('id',$id)->delete();
             if($deleted)
             {
                 $response=array(
                     'status'=>200,
-                    'message'=>'Sala eliminada'
+                    'message'=>'funcionAsiento eliminado'
                 );
             }else{
                 $response=array(
                     'status'=>400,
-                    'message'=>'No se pudo eliminar el recurso, compruebe que exista'
+                    'message'=>'No se pudo eliminar funcionAsiento, compruebe que exista'
                 );
             }
         }else{
             $response=array(
                 'status'=>406,
-                'message'=>'Falta el identificador del recurso a eliminar'
+                'message'=>'Falta el identificador de funcionAsiento a eliminar'
             );
         }
         return response()->json($response,$response['status']);
     }
 
-    //patch
+
     public function update(Request $request, $id) {
-        $sala = Sala::find($id);
-        if (!$sala) {
+        $funcionAsiento = FuncionAsiento::find($id);
+    
+        if (!$funcionAsiento) {
             $response = [
                 'status' => 404,
-                'message' => 'Sala no encontrada'
+                'message' => 'funcionAsiento no encontrado'
             ];
             return response()->json($response, $response['status']);
         }
@@ -122,8 +125,7 @@ class SalaController extends Controller
         }
     
         $rules = [
-            'nombreSala'=>'string',
-                'capacidad'=>'integer',
+            'estado'=>'boolean'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -137,18 +139,16 @@ class SalaController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        if(isset($data_input['nombreSala'])) { $sala->nombreSala = $data_input['nombreSala']; }
-        if(isset($data_input['capacidad'])) { $sala->capacidad = $data_input['capacidad']; }
-
-        $sala->save();
+        if(isset($data_input['estado'])) { $funcionAsiento->estado = $data_input['estado']; }
+        
+        $funcionAsiento->save();
     
         $response = [
             'status' => 201,
-            'message' => 'Sala actualizada',
-            'sala' => $sala
+            'message' => 'funcionAsiento actualizado',
+            'funcionAsiento' => $funcionAsiento
         ];
     
         return response()->json($response, $response['status']);
     }
-
 }

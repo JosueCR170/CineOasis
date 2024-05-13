@@ -9,7 +9,7 @@ class Tarjeta extends Model
 {
     use HasFactory;
     protected $table='tarjetas';
-    public function usuarios(){
+    public function usuario(){
         return $this->belongsTo(User::class,'idUsuario');
     }
 }

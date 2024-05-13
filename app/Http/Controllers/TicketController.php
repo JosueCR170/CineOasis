@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JwtAuth;
 use Illuminate\Http\Request;
 use App\Models\Ticket;
 
@@ -11,6 +12,10 @@ class TicketController extends Controller
     public function index()
     {   
         $data=Ticket::all();
+        $data = Ticket::with('funcion')->get();
+        $data = Ticket::with('detallesTicket')->get();
+        $data = Ticket::with('detallesCombo')->get();
+        $data = Ticket::with('usuario')->get();
         $response=array(
             "status"=>200,
             "message"=>"Todos los registros de los tickets",
@@ -26,25 +31,23 @@ class TicketController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idUsuario'=>'required|exists:users,id',
                 'idFuncion'=>'required|exists:funciones,id',
-                'cantEntradas'=>'required|integer',
                 'fechaCompra'=>'required|date',
                 'precioTotal'=>'required|decimal:0,4|integer'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
                 $ticket=new Ticket();
-                $ticket->idUsuario=$data['idUsuario'];
+                $jwt=new JwtAuth();
+                $ticket->idUsuario=$jwt->checkToken($request->header('bearertoken'),true)->iss;
                 $ticket->idFuncion=$data['idFuncion'];
-                $ticket->cantEntradas=$data['cantEntradas'];
                 $ticket->fechaCompra=$data['fechaCompra'];
                 $ticket->precioTotal=$data['precioTotal'];
                 $ticket->save();
                 $response=array(
                     'status'=>201,
                     'message'=>'ticket creado',
-                    'tarjeta'=>$ticket
+                    'ticket'=>$ticket
                 );
             }else{
                 $response=array(
@@ -66,10 +69,14 @@ class TicketController extends Controller
     public function show($id){
         $data=Ticket::find($id);
         if(is_object($data)){
+            $data = Ticket::with('funcion')->get();
+        $data = Ticket::with('detallesTicket')->get();
+        $data = Ticket::with('detallesCombo')->get();
+        $data = Ticket::with('usuario')->get();
             $response=array(
                 'status'=>200,
                 'message'=>'Datos del ticket',
-                'tarjeta'=>$data
+                'ticket'=>$data
             );
         }else{
             $response=array(
@@ -104,7 +111,6 @@ class TicketController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    //patch
     public function update(Request $request, $id) {
         $ticket = Ticket::find($id);
     
@@ -128,9 +134,6 @@ class TicketController extends Controller
         }
     
         $rules = [
-            'idUsuario'=>'exists:users,id',
-            'idFuncion'=>'exists:funciones,id',
-            'cantEntradas'=>'integer',
             'fechaCompra'=>'date',
             'precioTotal'=>'decimal:0,4|integer'
         ];
@@ -145,10 +148,6 @@ class TicketController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-    
-        if(isset($data_input['idUsuario'])) { $ticket->idUsuario = $data_input['idUsuario']; }
-        if(isset($data_input['idFuncion'])) { $ticket->idFuncion = $data_input['idFuncion']; }
-        if(isset($data_input['cantEntradas'])) { $ticket->cantEntradas = $data_input['cantEntradas']; }
         if(isset($data_input['fechaCompra'])) { $ticket->fechaCompra = $data_input['fechaCompra']; }
         if(isset($data_input['precioTotal'])) { $ticket->precioTotal = $data_input['precioTotal']; }
 
@@ -156,7 +155,7 @@ class TicketController extends Controller
     
         $response = [
             'status' => 201,
-            'message' => 'Usuario actualizado',
+            'message' => 'ticket actualizado',
             'ticket' => $ticket
         ];
     

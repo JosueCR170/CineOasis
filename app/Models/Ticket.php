@@ -11,11 +11,11 @@ class Ticket extends Model
 
     protected $table='tickets';
 
-    public function usuarios(){
+    public function usuario(){
         return $this->belongsTo(User::class,'idUsuario');
     }
 
-    public function funciones(){
+    public function funcion(){
         return $this->belongsTo(Funcion::class,'idFuncion');
     }
 

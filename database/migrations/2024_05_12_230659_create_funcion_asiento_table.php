@@ -11,22 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tickets', function (Blueprint $table) {
+        Schema::create('funcion_asiento', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('idUsuario')
-            ->constrained('users')
-            ->nullable()
-            ->cascadeOnUpdate()
-            ->cascadeOnDelete();
-
             $table->foreignId('idFuncion')
             ->constrained('funciones')
             ->nullable()
             ->cascadeOnUpdate()
             ->cascadeOnDelete();
-            $table->date('fechaCompra');
-            $table->float('precioTotal');
+            $table->foreignId('idAsiento')
+            ->constrained('asientos')
+            ->nullable()
+            ->cascadeOnUpdate()
+            ->cascadeOnDelete();
+            $table->boolean('estado');
         });
     }
 
@@ -35,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tickets');
+        Schema::dropIfExists('funcion_asiento');
     }
 };

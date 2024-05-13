@@ -10,13 +10,13 @@ class Asiento extends Model
     use HasFactory;
     
     protected $table='asientos';
-    protected $fillable=['numero','fila','estado'];
 
-    public function sala(){
-        return $this->belongsTo(Sala::class,'idSala');
-    }
 
     public function detallesTicket(){
         return $this->hasMany(DetallesTicket::class, 'idAsiento');
+    }
+
+    public function funcionesAsiento(){
+        return $this->hasMany(FuncionAsiento::class, 'idAsiento');
     }
 }

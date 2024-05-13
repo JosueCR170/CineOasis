@@ -123,7 +123,19 @@ class PeliculaController extends Controller
         }
 
 
-        public function destroy($id){
+        public function destroy(Request $request, $id){
+
+            $jwt=new JwtAuth();
+            if(!$jwt->checkToken($request->header('bearertoken'),true)->permisoAdmin){
+             $response = array(
+                 'status'=>406,
+                 'menssage'=>'No tienes permiso de administrador'
+                
+             );
+             return response()->json($response,$response['status']);
+            }
+            else{
+
             if(isset($id)){
                 $pelicula=Pelicula::find($id);
                 $imagenes = $pelicula->imagenes;
@@ -151,11 +163,24 @@ class PeliculaController extends Controller
                     'menssage'=>'Falta el identificador del recurso a eliminar'
                 );
             }
+        }
+
             return response()->json($response,$response['status']);
         }
 
         //patch
     public function update(Request $request, $id) {
+        $jwt=new JwtAuth();
+        if(!$jwt->checkToken($request->header('bearertoken'),true)->permisoAdmin){
+         $response = array(
+             'status'=>406,
+             'menssage'=>'No tienes permiso de administrador'
+            
+         );
+         return response()->json($response,$response['status']);
+        }
+        else{
+
         $pelicula = Pelicula::find($id);
         if (!$pelicula) {
             $response = [
@@ -224,6 +249,7 @@ class PeliculaController extends Controller
             'Pelicula' => $pelicula
         ];
     
+    }
         return response()->json($response, $response['status']);
     }
     
