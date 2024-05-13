@@ -17,7 +17,7 @@ class Funcion extends Model
     protected $fillable=['fecha','horaInicio','horaFinal', 'precio'];
 
 
-    public function peliculas(){
+    public function pelicula(){
         return $this->belongsTo(Pelicula::class,'idPelicula');
     }
 
@@ -28,6 +28,8 @@ class Funcion extends Model
     public function funcionAsientos(){
         return $this->hasMany(FuncionAsiento::class,'idFuncion');
     }
+
+    public static function getSalas(){return self::$salas;}
 
 
 }

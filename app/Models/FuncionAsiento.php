@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class FuncionAsiento extends Model
 {
     use HasFactory;
-    protected $table = "FuncionAsiento";
+    protected $table = "funcion_asiento";
+    public $timestamps = false;
 
     public function funcion(){
         return $this->belongsTo(Funcion::class,'idFuncion');

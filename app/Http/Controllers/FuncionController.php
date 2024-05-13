@@ -13,7 +13,7 @@ class FuncionController extends Controller
     public function index()
     {
         $data=Funcion::all();
-        $data=$data->load('peliculas');
+        $data=$data->load('pelicula');
         $data=$data->load('funcionAsientos');
         $response=array(
             "status"=>200,
@@ -81,7 +81,7 @@ class FuncionController extends Controller
     public function show($id){
         $data=Funcion::find($id);
         if(is_object($data)){
-            $data=$data->load('peliculas');
+            $data=$data->load('pelicula');
             $data=$data->load('funcionAsientos');
             $response=array(
                 'status'=>200,

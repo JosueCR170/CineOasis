@@ -27,8 +27,8 @@ class DetallesTicketController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idTicket'=>'required|exists:tickets, id',
-                'idAsiento'=>'required|exists:asientos, id',
+                'idTicket'=>'required|exists:tickets,id',
+                'idAsiento'=>'required|exists:asientos,id',
                 'subtotal'=>'required|decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
@@ -140,8 +140,8 @@ class DetallesTicketController extends Controller
         }
     
         $rules = [
-            'idTicket'=>'exists:tickets, id',
-            'idAsiento'=>'exists:asientos, id',
+            'idTicket'=>'exists:tickets,id',
+            'idAsiento'=>'exists:asientos,id',
             'subtotal'=>'decimal:0,4'
         ];
     

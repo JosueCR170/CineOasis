@@ -9,6 +9,7 @@ class DetallesTicket extends Model
 {
     use HasFactory;
     protected $table='detalles_ticket';
+    public $timestamps = false;
 
     public function asiento(){
         return $this->belongsTo(Asiento::class,'idAsiento');

@@ -10,7 +10,7 @@ class Ticket extends Model
     use HasFactory;
 
     protected $table='tickets';
-
+    public $timestamps = false;
     public function usuario(){
         return $this->belongsTo(User::class,'idUsuario');
     }

@@ -27,8 +27,8 @@ class FuncionAsientoController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idFuncion'=>'required|exists:funciones, id',
-                'idAsiento'=>'required|exists:asientos, id',
+                'idFuncion'=>'required|exists:funciones,id',
+                'idAsiento'=>'required|exists:asientos,id',
                 'estado'=>'required|boolean'
             ];
             $isValid=\validator($data,$rules);
@@ -40,7 +40,7 @@ class FuncionAsientoController extends Controller
                 $funcionAsiento->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'funcioAsiento creada',
+                    'message'=>'funcionAsiento creada',
                     'funcionAsiento'=>$funcionAsiento
                 );
             }else{

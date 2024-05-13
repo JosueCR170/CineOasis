@@ -30,10 +30,12 @@ Route::prefix('v1')->group(
         Route::post('/asiento/rellenar',[AsientoController::class,'rellenar'])->middleware(ApiAuthMiddleware::class);// (Actualizar)
         Route::post('/comida',[ComidaController::class,'store'])->middleware(ApiAuthMiddleware::class);
         Route::post('/imagen',[ImagenController::class,'store'])->middleware(ApiAuthMiddleware::class);
+        Route::post('/funcion',[FuncionController::class,'store'])->middleware(ApiAuthMiddleware::class);
         //show
         Route::get('/user/getIdentity',[UserController::class,'getIdentity'])->middleware(ApiAuthMiddleware::class);//listo
         Route::get('/comida/{id}', [ComidaController::class, 'show']);
         Route::get('/asiento/{id}', [AsientoController::class, 'show']);
+        Route::get('/funcion/{id}', [FuncionController::class, 'show']);
         Route::get('/pelicula/{id}', [PeliculaController::class, 'show']);//listo
         Route::get('/user/{id}', [UserController::class, 'show'])->middleware(ApiAuthMiddleware::class);//listo
         Route::get('/imagen/{nombre}', [ImagenController::class, 'show']);
@@ -61,12 +63,14 @@ Route::prefix('v1')->group(
         Route::delete('/funcion/{id}',[FuncionController::class,'destroy'])->middleware(ApiAuthMiddleware::class);//listo
         Route::delete('/pelicula/{id}', [PeliculaController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);//listo
         Route::delete('/imagen/{id}', [ImagenController::class, 'destroy'])->middleware(ApiAuthMiddleware::class);//listooo
+        
         //resource
         Route::resource('/ticket',TicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
-        Route::resource('/detalles_ticket',DetallesTicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
+        Route::resource('/detallesTicket',DetallesTicketController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class);
         Route::resource('/combo',DetallesComboController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class); 
         Route::resource('/funcionAsiento',FuncionAsientoController::class,['except'=>['create','edit']])->middleware(ApiAuthMiddleware::class); 
         
 
+      
     }
 );
