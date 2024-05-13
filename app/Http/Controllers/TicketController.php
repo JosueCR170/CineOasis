@@ -32,7 +32,6 @@ class TicketController extends Controller
             $data=array_map('trim',$data);
             $rules=[
                 'idFuncion'=>'required|exists:funciones,id',
-                'cantEntradas'=>'required|integer',
                 'fechaCompra'=>'required|date',
                 'precioTotal'=>'required|decimal:0,4|integer'
             ];
@@ -42,14 +41,13 @@ class TicketController extends Controller
                 $jwt=new JwtAuth();
                 $ticket->idUsuario=$jwt->checkToken($request->header('bearertoken'),true)->iss;
                 $ticket->idFuncion=$data['idFuncion'];
-                $ticket->cantEntradas=$data['cantEntradas'];
                 $ticket->fechaCompra=$data['fechaCompra'];
                 $ticket->precioTotal=$data['precioTotal'];
                 $ticket->save();
                 $response=array(
                     'status'=>201,
                     'message'=>'ticket creado',
-                    'tarjeta'=>$ticket
+                    'ticket'=>$ticket
                 );
             }else{
                 $response=array(
@@ -78,7 +76,7 @@ class TicketController extends Controller
             $response=array(
                 'status'=>200,
                 'message'=>'Datos del ticket',
-                'tarjeta'=>$data
+                'ticket'=>$data
             );
         }else{
             $response=array(
@@ -113,7 +111,6 @@ class TicketController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    //patch
     public function update(Request $request, $id) {
         $ticket = Ticket::find($id);
     
@@ -137,7 +134,6 @@ class TicketController extends Controller
         }
     
         $rules = [
-            'cantEntradas'=>'integer',
             'fechaCompra'=>'date',
             'precioTotal'=>'decimal:0,4|integer'
         ];
@@ -152,8 +148,6 @@ class TicketController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-
-        if(isset($data_input['cantEntradas'])) { $ticket->cantEntradas = $data_input['cantEntradas']; }
         if(isset($data_input['fechaCompra'])) { $ticket->fechaCompra = $data_input['fechaCompra']; }
         if(isset($data_input['precioTotal'])) { $ticket->precioTotal = $data_input['precioTotal']; }
 

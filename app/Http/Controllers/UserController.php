@@ -125,8 +125,7 @@ class UserController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    //patch
-    public function update(Request $request, $id) { //listo
+    public function update(Request $request, $id) { 
         $user = User::find($id);
         if (!$user) {
             $response = [
