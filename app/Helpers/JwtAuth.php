@@ -25,6 +25,7 @@ class JwtAuth{
                 'apellido'=>$user->apellido,
                 'fechaNacimiento'=>$user->fechaNacimiento,
                 'permisoAdmin'=>$user->permisoAdmin,
+                'imagen'=>$user->imagen,
                 'iat'=>time(),
                 'exp'=>time()+(10000)
             );

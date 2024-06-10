@@ -5,13 +5,103 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Imagen;
-// use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Helpers\JwtAuth;
 
 class ImagenController extends Controller
 {
-    //
+    //funciones utilizadas por tablas que contienen solo una imagen
+    public function store(Request $request, string $path)
+    {
+        $isValid=\Validator::make($request->all(),['file'=>'required|mimes:jpg,png,jpeg,svg']);
+        if(!$isValid->fails()){
+            $image=$request->file('file');
+            $filename = \Str::uuid() . "." . $image->getClientOriginalExtension();
+            \Storage::disk($path)->put($filename,\File::get($image));
+            $response=array(
+                'status'=>201,
+                'message'=>'Imagen guardada',
+                'filename'=>$filename,
+            );
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'Error: no se encontró el archivo',
+                'errors'=>$isValid->errors(),
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function update(Request $request, string $path, string $filename)
+    {
+        $isValid=\Validator::make($request->all(),['file'=>'required|mimes:jpg,png,jpeg,svg']);
+        if(!$isValid->fails()){
+            $image=$request->file('file');
+            \Storage::disk($path)->put($filename, \File::get($image));
+            $response=array(
+                'status'=>201,
+                'message'=>'Imagen actualizada',
+                'filename'=>$filename,
+            );
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'Error: no se encontró el archivo',
+                'errors'=>$isValid->errors(),
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function show(string $path, string $filename){
+        if(isset($filename)){
+            $exist=\Storage::disk($path)->exists($filename);
+            if($exist){
+                $file=\Storage::disk($path)->get($filename);
+                return new Response($file,200);
+            }else{
+                $response=array(
+                    'status'=>404,
+                    'message'=>'No existe la imagen',
+                );
+            }
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'No se definió el nombre de la imagen',
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function destroy(string $path, string $filename){
+        if(isset($filename)){
+            $exist=\Storage::disk($path)->exists($filename);
+            if($exist){
+            \Storage::disk($path)->delete($filename);
+            
+            $response = array(
+                'status' => 200,
+                'message' => 'Imagen eliminada'
+            );
+        } else {
+            $response = array(
+                'status' => 404,
+                'message' => 'No existe la imagen'
+            );
+        }
+    }else{
+        $response=array(
+            'status'=>406,
+            'message'=>'No se definió el nombre de la imagen',
+        );}
+        return response()->json($response, $response['status']);
+    }
+
+
+
+    //Funciones para la tabla imagenes (una pelicula puede tener varias imagenes)
     public function index()
     {
         $data = Imagen::all();
@@ -23,8 +113,28 @@ class ImagenController extends Controller
         return response()->json($response, 200);
     }
 
+    public function showImageForPelicula(string $filename){
+        if(isset($filename)){
+            $exist=\Storage::disk('peliculas')->exists($filename);
+            if($exist){
+                $file=\Storage::disk('peliculas')->get($filename);
+                return new Response($file,200);
+            }else{
+                $response=array(
+                    'status'=>404,
+                    'message'=>'No existe la imagen',
+                );
+            }
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'No se definió el nombre de la imagen',
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
 
-    public function store(Request $request)
+    public function storeImageForPelicula(Request $request)
     {
         $jwt = new JwtAuth();
         if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
@@ -79,47 +189,8 @@ class ImagenController extends Controller
         return response()->json($response, $response['status']);
     }
 
-    public function destroy(Request $request, $id)
-    {
 
-        $jwt = new JwtAuth();
-        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
-            $response = array(
-                'status' => 406,
-                'menssage' => 'No tienes permiso de administrador'
-
-            );
-           
-        } else {
-
-        if (isset($id)) {
-            $imagen = Imagen::find($id);
-            $delete = Imagen::where('id', $id)->delete();
-            if ($delete) {
-
-                $filename = $imagen->imagen;
-                \Storage::disk('peliculas')->delete($filename);
-                $response = array(
-                    'status' => 200,
-                    'menssage' => 'Imagen eliminada',
-                );
-            } else {
-                $response = array(
-                    'status' => 400,
-                    'menssage' => 'No se pudo eliminar la Imagen, compruebe que exista'
-                );
-            }
-        } else {
-            $response = array(
-                'status' => 406,
-                'menssage' => 'Falta el identificador del recurso a eliminar'
-            );
-        }
-    }
-        return response()->json($response, $response['status']);
-    }
-
-    public function update(Request $request, $id)
+    public function updateImageForPelicula(Request $request, $id)
     {
         $jwt = new JwtAuth();
         if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
@@ -180,28 +251,4 @@ class ImagenController extends Controller
     }
         return response()->json($response, $response['status']);
     }
-
-    public function show($filename)
-    {
-        if (isset($filename)) {
-            $exist = \Storage::disk('peliculas')->exists($filename);
-            if ($exist) {
-                $file = \Storage::disk('peliculas')->get($filename);
-                return new Response($file, 200);
-            } else {
-                $response = array(
-                    'status' => 404,
-                    'message' => 'Imagen no existe'
-                );
-            }
-        } else {
-            $response = array(
-                'status' => 406,
-                'message' => 'No se definió el nombre de la imagen'
-            );
-        }
-        return response()->json($response, $response['status']);
-
-    }
-
 }
