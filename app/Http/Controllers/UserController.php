@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Helpers\JwtAuth;
+use App\Models\Ticket;
+use App\Models\DetalleTicket;
+use App\Models\ComboComida;
+
 
 class UserController extends Controller
 {
@@ -232,6 +236,74 @@ class UserController extends Controller
         return response()->json($response);
     }
 
-    
+
+
+public function buy(Request $request)
+{ 
+    $jwt = new JwtAuth();
+    $token = $request->header('bearertoken');
+    if (isset($token)) {
+        $user = $jwt->checkToken($token, true);
+        if ($user) {
+            try {
+                // Iniciar una transacción
+                DB::beginTransaction();
+                
+                // Crear el ticket
+                $ticket = new Ticket();
+                $ticket->user_id = $user->id; // Suponiendo que hay un campo 'user_id' en el modelo Ticket para asociar con el usuario
+                $ticket->funcion_id = $request->input('funcion_id'); // Suponiendo que recibes el ID de la función de la película desde la solicitud
+                $ticket->save();
+
+                // Crear los detalles del ticket (asientos)
+                foreach ($request->input('detalles') as $detalle) {
+                    $detalleTicket = new DetalleTicket();
+                    $detalleTicket->ticket_id = $ticket->id;
+                    $detalleTicket->asiento_id = $detalle['asiento_id']; // Suponiendo que cada detalle contiene el ID del asiento comprado
+                    $detalleTicket->subtotal = $detalle['subtotal']; // Suponiendo que cada detalle contiene el subtotal asociado
+                    $detalleTicket->save();
+                }
+
+                // Asociar los combos de comida al ticket
+                $combosComida = $request->input('combos_comida', []);
+                foreach ($combosComida as $comboId) {
+                    $comboComida = ComboComida::find($comboId);
+                    if ($comboComida) {
+                        $ticket->combosComida()->attach($comboComida->id);
+                    }
+                }
+
+                // Confirmar la transacción
+                DB::commit();
+
+                $response = [
+                    'status' => 200,
+                    'message' => 'Ticket creado satisfactoriamente',
+                    'ticket' => $ticket,
+                ];
+            } catch (\Exception $e) {
+                // Revertir la transacción en caso de error
+                DB::rollBack();
+
+                $response = [
+                    'status' => 500,
+                    'message' => 'Error al crear el ticket: ' . $e->getMessage(),
+                ];
+            }
+        } else {
+            $response = [
+                'status' => 401,
+                'message' => 'Token inválido',
+            ];
+        }
+    } else {
+        $response = [
+            'status' => 404,
+            'message' => 'Token (bearertoken) no encontrado',
+        ];
+    }
+    return response()->json($response);
+}
+
     
 }
