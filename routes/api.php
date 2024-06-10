@@ -21,6 +21,18 @@ use App\Http\Middleware\ApiAuthMiddleware;
 Route::prefix('v1')->group(
     function(){
         //RUTAS ESPECIFICAS
+        //RUTAS IMAGEN USUARIO
+        Route::get('/user/getImage/{filename}',[UserController::class,'getUserImage'])->middleware(ApiAuthMiddleware::class);
+        Route::post('/user/storeImage',[UserController::class,'uploadUserImage'])->middleware(ApiAuthMiddleware::class);
+        Route::put('/user/updateImage/{filename}',[UserController::class,'updateUserImage'])->middleware(ApiAuthMiddleware::class);
+        Route::delete('/user/deleteImage/{filename}',[UserController::class,'destroyImage'])->middleware(ApiAuthMiddleware::class);
+
+         //RUTAS IMAGEN COMIDA
+         Route::get('/comida/getImage/{filename}',[ComidaController::class,'getImage'])->middleware(ApiAuthMiddleware::class);
+         Route::post('/comida/storeImage',[ComidaController::class,'uploadImage'])->middleware(ApiAuthMiddleware::class);
+         Route::put('/comida/updateImage/{filename}',[ComidaController::class,'updateImage'])->middleware(ApiAuthMiddleware::class);
+         Route::delete('/comida/deleteImage/{filename}',[ComidaController::class,'destroyImage'])->middleware(ApiAuthMiddleware::class);
+ 
         
         //POST
         Route::post('/user/login',[UserController::class,'login']);//listo

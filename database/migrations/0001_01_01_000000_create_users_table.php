@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->date('fechaNacimiento');
             $table->boolean('permisoAdmin');
+            $table->string('imagen')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

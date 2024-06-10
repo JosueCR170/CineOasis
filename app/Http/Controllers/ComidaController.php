@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\Comida;
 use App\Helpers\JwtAuth;
 
@@ -34,13 +35,15 @@ class ComidaController extends Controller
             $data=array_map('trim',$data);
             $rules=[
                 'nombre'=>'required|max:40|string',
-                'precio'=>'required|decimal:0,4'
+                'precio'=>'required|decimal:0,4',
+                'comida'=>'required|string'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
                 $comida=new Comida();
                 $comida->nombre=$data['nombre'];
                 $comida->precio=$data['precio'];
+                $comida->imagen=$data['imagen'];
                 $comida->save();
                 $response=array(
                     'status'=>201,
@@ -90,13 +93,26 @@ class ComidaController extends Controller
                 'menssage' => 'No tienes permiso de administrador'
             );
         } else {
+
         if(isset($id)){
-            $deleted=Comida::where('id',$id)->delete();
-            if($deleted)
+            $comida=Comida::find($id);
+            if (!$comida) {
+                return response()->json(['status' => 404, 'message' => 'Comida no encontrada'], 404);
+            }
+            //eliminar imagen si existe
+            if ($comida->imagen) {
+                $filename = $comida->imagen;
+                if (\Storage::disk('comidas')->exists($filename)) {
+                    if (!\Storage::disk('comidas')->delete($filename)) {
+                        return response()->json(['status' => 500, 'message' => 'Error al eliminar la imagen de la comida'], 500);
+                    }
+                }
+            }
+            if($comida->delete())
             {
                 $response=array(
                     'status'=>200,
-                    'message'=>'Comida eliminado'
+                    'message'=>'Comida eliminada'
                 );
             }else{
                 $response=array(
@@ -172,4 +188,93 @@ class ComidaController extends Controller
         }
         return response()->json($response, $response['status']);
     }
+
+    public function uploadImage(Request $request)
+    {
+        $isValid=\Validator::make($request->all(),['file'=>'required|mimes:jpg,png,jpeg,svg']);
+        if(!$isValid->fails()){
+            $image=$request->file('file');
+            $filename = \Str::uuid() . "." . $image->getClientOriginalExtension();
+            \Storage::disk('comidas')->put($filename,\File::get($image));
+            $response=array(
+                'status'=>201,
+                'message'=>'Imagen guardada',
+                'filename'=>$filename,
+            );
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'Error: no se encontró el archivo',
+                'errors'=>$isValid->errors(),
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function updateImage(Request $request, string $filename)
+    {
+        $isValid=\Validator::make($request->all(),['file'=>'required|mimes:jpg,png,jpeg,svg']);
+        if(!$isValid->fails()){
+            $image=$request->file('file');
+            \Storage::disk('comidas')->put($filename, \File::get($image));
+            $response=array(
+                'status'=>201,
+                'message'=>'Imagen actualizada',
+                'filename'=>$filename,
+            );
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'Error: no se encontró el archivo',
+                'errors'=>$isValid->errors(),
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function getImage($filename){
+        if(isset($filename)){
+            $exist=\Storage::disk('comidas')->exists($filename);
+            if($exist){
+                $file=\Storage::disk('comidas')->get($filename);
+                return new Response($file,200);
+            }else{
+                $response=array(
+                    'status'=>404,
+                    'message'=>'No existe la imagen',
+                );
+            }
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'No se definió el nombre de la imagen',
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function destroyImage($filename){
+        if(isset($filename)){
+            $exist=\Storage::disk('comidas')->exists($filename);
+            if($exist){
+            \Storage::disk('comidas')->delete($filename);
+            
+            $response = array(
+                'status' => 200,
+                'message' => 'Imagen eliminada'
+            );
+        } else {
+            $response = array(
+                'status' => 404,
+                'message' => 'No existe la imagen'
+            );
+        }
+    }else{
+        $response=array(
+            'status'=>406,
+            'message'=>'No se definió el nombre de la imagen',
+        );}
+        return response()->json($response, $response['status']);
+    }
+
 }

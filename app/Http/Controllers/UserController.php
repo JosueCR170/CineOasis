@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\User;
 use App\Helpers\JwtAuth;
 
@@ -41,7 +42,8 @@ class UserController extends Controller
                     'email' => 'required|email|unique:users,email',
                     'password' => 'required|alpha_dash',
                     'fechaNacimiento' => 'required|date',
-                    'permisoAdmin' => 'required|boolean'
+                    'permisoAdmin' => 'required|boolean',
+                    'imagen'=>'string'
                 ];
                 $validator = validator($data, $rules);
                 if (!$validator->fails()) {
@@ -52,6 +54,7 @@ class UserController extends Controller
                     $user->password = hash('sha256', $data['password']);
                     $user->fechaNacimiento = $data['fechaNacimiento'];
                     $user->permisoAdmin = $data['permisoAdmin'];
+                    $user->imagen = $data['imagen'];
                     $user->save();
                     $response = [
                         'status' => 201,
@@ -101,8 +104,20 @@ class UserController extends Controller
 
     public function destroy($id){
         if(isset($id)){
-            $deleted=User::where('id',$id)->delete();
-            if($deleted)
+            $user=User::find($id);
+            if (!$user) {
+                return response()->json(['status' => 404, 'message' => 'Usuario no encontrado'], 404);
+            }
+            //eliminar imagen si existe
+            if ($user->imagen) {
+                $filename = $user->imagen;
+                if (\Storage::disk('usuarios')->exists($filename)) {
+                    if (!\Storage::disk('usuarios')->delete($filename)) {
+                        return response()->json(['status' => 500, 'message' => 'Error al eliminar la imagen del usuario'], 500);
+                    }
+                }
+            }
+            if($user->delete())
             {
                 $response=array(
                     'status'=>200,
@@ -114,6 +129,7 @@ class UserController extends Controller
                     'message'=>'No se pudo eliminar el recurso, compruebe que exista'
                 );
             }
+
         }else{
             $response=array(
                 'status'=>406,
@@ -150,7 +166,8 @@ class UserController extends Controller
             'email'=>'email|unique:users,email',
             'password'=>'alpha_dash',
             'fechaNacimiento'=>'date',
-            'permisoAdmin'=>'boolean'
+            'permisoAdmin'=>'boolean',
+            'imagen'=>'string'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -170,6 +187,7 @@ class UserController extends Controller
         if(isset($data_input['password'])) { $user->password = hash('sha256', $data_input['password']); }
         if(isset($data_input['fechaNacimiento'])) { $user->fechaNacimiento = $data_input['fechaNacimiento']; }
         if(isset($data_input['permisoAdmin'])) { $user->permisoAdmin = $data_input['permisoAdmin']; }
+        if(isset($data_input['imagen'])) { $user->imagen = $data_input['imagen']; }
 
         $user->save();
     
@@ -229,6 +247,91 @@ class UserController extends Controller
         return response()->json($response);
     }
 
-    
-    
+    public function uploadUserImage(Request $request)
+    {
+        $isValid=\Validator::make($request->all(),['file'=>'required|mimes:jpg,png,jpeg,svg']);
+        if(!$isValid->fails()){
+            $image=$request->file('file');
+            $filename = \Str::uuid() . "." . $image->getClientOriginalExtension();
+            \Storage::disk('usuarios')->put($filename,\File::get($image));
+            $response=array(
+                'status'=>201,
+                'message'=>'Imagen guardada',
+                'filename'=>$filename,
+            );
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'Error: no se encontró el archivo',
+                'errors'=>$isValid->errors(),
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function updateUserImage(Request $request, string $filename)
+    {
+        $isValid=\Validator::make($request->all(),['file'=>'required|mimes:jpg,png,jpeg,svg']);
+        if(!$isValid->fails()){
+            $image=$request->file('file');
+            \Storage::disk('usuarios')->put($filename, \File::get($image));
+            $response=array(
+                'status'=>201,
+                'message'=>'Imagen actualizada',
+                'filename'=>$filename,
+            );
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'Error: no se encontró el archivo',
+                'errors'=>$isValid->errors(),
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function getUserImage($filename){
+        if(isset($filename)){
+            $exist=\Storage::disk('usuarios')->exists($filename);
+            if($exist){
+                $file=\Storage::disk('usuarios')->get($filename);
+                return new Response($file,200);
+            }else{
+                $response=array(
+                    'status'=>404,
+                    'message'=>'No existe la imagen',
+                );
+            }
+        }else{
+            $response=array(
+                'status'=>406,
+                'message'=>'No se definió el nombre de la imagen',
+            );
+        }
+        return response()->json($response,$response['status']);
+    }
+
+    public function destroyImage($filename){
+        if(isset($filename)){
+            $exist=\Storage::disk('usuarios')->exists($filename);
+            if($exist){
+            \Storage::disk('usuarios')->delete($filename);
+            
+            $response = array(
+                'status' => 200,
+                'message' => 'Imagen eliminada'
+            );
+        } else {
+            $response = array(
+                'status' => 404,
+                'message' => 'No existe la imagen'
+            );
+        }
+    }else{
+        $response=array(
+            'status'=>406,
+            'message'=>'No se definió el nombre de la imagen',
+        );}
+        return response()->json($response, $response['status']);
+    }
 }
