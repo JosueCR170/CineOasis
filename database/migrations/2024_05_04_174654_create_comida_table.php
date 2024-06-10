@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre');
             $table->float('precio');
+            $table->string('imagen');
             $table->timestamps();
 
         });

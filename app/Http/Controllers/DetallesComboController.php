@@ -30,8 +30,8 @@ class DetallesComboController extends Controller
                 'idComida'=>'required|exists:comida,id',
                 'cantidad'=>'required|integer',
                 'subtotal'=>'required|decimal:0,4',
-                'descuento'=>'decimal:0,4',
-                'impuesto'=>'decimal:0,4'
+                'descuento'=>'required|decimal:0,4',
+                'impuesto'=>'required|decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
@@ -131,7 +131,6 @@ class DetallesComboController extends Controller
         }
     
         $rules = [
-            'idTicket'=>'exists:tickets,id',
                 'idComida'=>'exists:comida,id',
                 'cantidad'=>'integer',
                 'subtotal'=>'decimal:0,4',

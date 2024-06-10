@@ -12,10 +12,10 @@ class TicketController extends Controller
     public function index()
     {   
         $data=Ticket::all();
-        $data = Ticket::with('funcion')->get();
-        $data = Ticket::with('detallesTicket')->get();
-        $data = Ticket::with('detallesCombo')->get();
-        $data = Ticket::with('usuario')->get();
+        $data=$data->load('funcion');
+        $data=$data->load('detallesTicket');
+        $data=$data->load('detallesCombo');
+        $data=$data->load('usuario');
         $response=array(
             "status"=>200,
             "message"=>"Todos los registros de los tickets",
@@ -33,7 +33,7 @@ class TicketController extends Controller
             $rules=[
                 'idFuncion'=>'required|exists:funciones,id',
                 'fechaCompra'=>'required|date',
-                'precioTotal'=>'required|decimal:0,4|integer'
+                'precioTotal'=>'required|decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
@@ -69,10 +69,10 @@ class TicketController extends Controller
     public function show($id){
         $data=Ticket::find($id);
         if(is_object($data)){
-            $data = Ticket::with('funcion')->get();
-        $data = Ticket::with('detallesTicket')->get();
-        $data = Ticket::with('detallesCombo')->get();
-        $data = Ticket::with('usuario')->get();
+            $data=$data->load('funcion');
+            $data=$data->load('detallesTicket');
+            $data=$data->load('detallesCombo');
+            $data=$data->load('usuario');
             $response=array(
                 'status'=>200,
                 'message'=>'Datos del ticket',
@@ -87,7 +87,14 @@ class TicketController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request, $id){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         if(isset($id)){
             $deleted=Ticket::where('id',$id)->delete();
             if($deleted)
@@ -108,10 +115,18 @@ class TicketController extends Controller
                 'message'=>'Falta el identificador del recurso a eliminar'
             );
         }
+    }
         return response()->json($response,$response['status']);
     }
 
     public function update(Request $request, $id) {
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $ticket = Ticket::find($id);
     
         if (!$ticket) {
@@ -135,7 +150,7 @@ class TicketController extends Controller
     
         $rules = [
             'fechaCompra'=>'date',
-            'precioTotal'=>'decimal:0,4|integer'
+            'precioTotal'=>'decimal:0,4'
         ];
     
         $validator = \validator($data_input, $rules);
@@ -158,7 +173,7 @@ class TicketController extends Controller
             'message' => 'ticket actualizado',
             'ticket' => $ticket
         ];
-    
+        }
         return response()->json($response, $response['status']);
     }
 }

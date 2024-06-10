@@ -24,6 +24,8 @@ return new class extends Migration
             ->cascadeOnUpdate()
             ->cascadeOnDelete();
             $table->boolean('estado');
+
+            //$table->unique(['idFuncion', 'idAsiento']);
         });
     }
 

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\Comida;
+use App\Helpers\JwtAuth;
 
 class ComidaController extends Controller
 {
@@ -20,19 +22,28 @@ class ComidaController extends Controller
     }
 
     public function store(Request $request){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $data_input=$request->input('data',null);
         if($data_input){
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
                 'nombre'=>'required|max:40|string',
-                'precio'=>'required|decimal:0,4'
+                'precio'=>'required|decimal:0,4',
+                'comida'=>'required|string'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
                 $comida=new Comida();
                 $comida->nombre=$data['nombre'];
                 $comida->precio=$data['precio'];
+                $comida->imagen=$data['imagen'];
                 $comida->save();
                 $response=array(
                     'status'=>201,
@@ -51,6 +62,7 @@ class ComidaController extends Controller
                 'status'=>400,
                 'message'=>'No se encontró el objeto data'
             );
+        }
         }
         return response()->json($response,$response['status']);
     }
@@ -73,14 +85,34 @@ class ComidaController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request,$id){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
+
         if(isset($id)){
-            $deleted=Comida::where('id',$id)->delete();
-            if($deleted)
+            $comida=Comida::find($id);
+            if (!$comida) {
+                return response()->json(['status' => 404, 'message' => 'Comida no encontrada'], 404);
+            }
+            //eliminar imagen si existe
+            if ($comida->imagen) {
+                $filename = $comida->imagen;
+                if (\Storage::disk('comidas')->exists($filename)) {
+                    if (!\Storage::disk('comidas')->delete($filename)) {
+                        return response()->json(['status' => 500, 'message' => 'Error al eliminar la imagen de la comida'], 500);
+                    }
+                }
+            }
+            if($comida->delete())
             {
                 $response=array(
                     'status'=>200,
-                    'message'=>'Comida eliminado'
+                    'message'=>'Comida eliminada'
                 );
             }else{
                 $response=array(
@@ -93,12 +125,19 @@ class ComidaController extends Controller
                 'status'=>406,
                 'message'=>'Falta el identificador del recurso a eliminar'
             );
-        }
+        }}
         return response()->json($response,$response['status']);
     }
 
     //patch
     public function update(Request $request, $id) {
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $comida = Comida::find($id);
     
         if (!$comida) {
@@ -146,7 +185,8 @@ class ComidaController extends Controller
             'message' => 'Comida actualizada',
             'Comida' => $comida
         ];
-    
+        }
         return response()->json($response, $response['status']);
     }
+
 }

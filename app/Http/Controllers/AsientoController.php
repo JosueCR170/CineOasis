@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Asiento;
+use App\Helpers\JwtAuth;
 
 class AsientoController extends Controller
 {
@@ -20,6 +21,13 @@ class AsientoController extends Controller
     }
 
     public function store(Request $request){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $data_input = $request->input('data', null);
         if ($data_input) {
             $data = json_decode($data_input, true);
@@ -54,11 +62,18 @@ class AsientoController extends Controller
                 'status' => 400,
                 'message' => 'No se encontró el objeto data'
             ];
-        }
+        }}
         return response()->json($response, $response['status']);
     }
 
     public function rellenar(Request $request){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $data_input = $request->input('data', null);
         if ($data_input) {
             $data = json_decode($data_input, true);
@@ -95,7 +110,7 @@ class AsientoController extends Controller
                 'status' => 400,
                 'message' => 'No se encontró el objeto data'
             ];
-        }
+        }}
         return response()->json($response, $response['status']);
     }
     
@@ -119,7 +134,14 @@ class AsientoController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request, $id){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         if(isset($id)){
             $deleted=Asiento::where('id',$id)->delete();
             if($deleted)
@@ -139,12 +161,19 @@ class AsientoController extends Controller
                 'status'=>406,
                 'message'=>'Falta el identificador del recurso a eliminar'
             );
-        }
+        }}
         return response()->json($response,$response['status']);
     }
 
     //patch
     public function update(Request $request, $id) {
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         $asiento = asiento::find($id);
     
         if (!$asiento) {
@@ -192,7 +221,7 @@ class AsientoController extends Controller
             'message' => 'asiento actualizado',
             'asiento' => $asiento
         ];
-    
+        }
         return response()->json($response, $response['status']);
     }
 

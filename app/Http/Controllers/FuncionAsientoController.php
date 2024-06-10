@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FuncionAsiento;
 use Illuminate\Http\Request;
+use App\Helpers\JwtAuth;
 
 class FuncionAsientoController extends Controller
 {
@@ -26,8 +27,8 @@ class FuncionAsientoController extends Controller
             $data=json_decode($data_input,true);
             $data=array_map('trim',$data);
             $rules=[
-                'idFuncion'=>'required|exists:funciones, id',
-                'idAsiento'=>'required|exists:asientos, id',
+                'idFuncion'=>'required|exists:funciones,id',
+                'idAsiento'=>'required|exists:asientos,id',
                 'estado'=>'required|boolean'
             ];
             $isValid=\validator($data,$rules);
@@ -39,7 +40,7 @@ class FuncionAsientoController extends Controller
                 $funcionAsiento->save();
                 $response=array(
                     'status'=>201,
-                    'message'=>'funcioAsiento creada',
+                    'message'=>'funcionAsiento creada',
                     'funcionAsiento'=>$funcionAsiento
                 );
             }else{
@@ -77,7 +78,14 @@ class FuncionAsientoController extends Controller
         return response()->json($response,$response['status']);
     }
 
-    public function destroy($id){
+    public function destroy(Request $request, $id){
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+            );
+        } else {
         if(isset($id)){
             $deleted=FuncionAsiento::where('id',$id)->delete();
             if($deleted)
@@ -98,6 +106,7 @@ class FuncionAsientoController extends Controller
                 'message'=>'Falta el identificador de funcionAsiento a eliminar'
             );
         }
+    }
         return response()->json($response,$response['status']);
     }
 

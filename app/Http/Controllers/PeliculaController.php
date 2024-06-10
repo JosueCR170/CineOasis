@@ -36,7 +36,6 @@ class PeliculaController extends Controller
             'menssage'=>'No tienes permiso de administrador'
            
         );
-        return response()->json($response,$response['status']);
        }
        else{
 
@@ -124,49 +123,55 @@ class PeliculaController extends Controller
 
 
         public function destroy(Request $request, $id){
-
-            $jwt=new JwtAuth();
-            if(!$jwt->checkToken($request->header('bearertoken'),true)->permisoAdmin){
-             $response = array(
-                 'status'=>406,
-                 'menssage'=>'No tienes permiso de administrador'
-                
-             );
-             return response()->json($response,$response['status']);
+            $jwt = new JwtAuth();
+            if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+                $response = array(
+                    'status' => 406,
+                    'message' => 'No tienes permiso de administrador'
+                );
+                return response()->json($response, $response['status']);
             }
-            else{
-
-            if(isset($id)){
-                $pelicula=Pelicula::find($id);
+            if (isset($id)) {
+                $pelicula = Pelicula::find($id);
+                if (!$pelicula) {
+                    $response = array(
+                        'status' => 404,
+                        'message' => 'Pelicula no encontrada'
+                    );
+                    return response()->json($response, $response['status']);
+                }
+        
                 $imagenes = $pelicula->imagenes;
+        
+                if ($imagenes) {
                     foreach ($imagenes as $imagen) {
-                        $filename= $imagen->imagen;
+                        $filename = $imagen->imagen;
                         \Storage::disk('peliculas')->delete($filename);
                     }
-
-                $delete=Pelicula::where('id',$id)->delete();
-                if($delete){
-                    
-                    $response=array(
-                        'status'=>200,
-                        'menssage'=>'pelicula eliminada',
-                        );
-                }else{
+                }
+                
+                $delete = Pelicula::where('id', $id)->delete();
+                if ($delete) {
                     $response = array(
-                        'status'=>400,
-                        'menssage'=>'No se pudo eliminar la pelicula, compruebe que exista'
+                        'status' => 200,
+                        'message' => 'Pelicula eliminada',
+                    );
+                } else {
+                    $response = array(
+                        'status' => 400,
+                        'message' => 'No se pudo eliminar la película, compruebe que exista'
                     );
                 }
-            }else{
+            } else {
                 $response = array(
-                    'status'=>406,
-                    'menssage'=>'Falta el identificador del recurso a eliminar'
+                    'status' => 406,
+                    'message' => 'Falta el identificador del recurso a eliminar'
                 );
             }
+        
+            return response()->json($response, $response['status']);
         }
-
-            return response()->json($response,$response['status']);
-        }
+        
 
         //patch
     public function update(Request $request, $id) {
@@ -177,7 +182,7 @@ class PeliculaController extends Controller
              'menssage'=>'No tienes permiso de administrador'
             
          );
-         return response()->json($response,$response['status']);
+        
         }
         else{
 
@@ -239,7 +244,7 @@ class PeliculaController extends Controller
         if(isset($data_input['calificacionEdad'])) { $pelicula->calificacionEdad = $data_input['calificacionEdad']; }
         if(isset($data_input['animacion'])) { $pelicula->animacion = $data_input['animacion']; }
         if(isset($data_input['director'])) { $pelicula->director = $data_input['director']; }
-        if(isset($data_input['elenco'])) { $pelicula->fechaEstreno = $data_input['elenco']; }
+        if(isset($data_input['elenco'])) { $pelicula->elenco = $data_input['elenco']; }
 
         $pelicula->save();
     
