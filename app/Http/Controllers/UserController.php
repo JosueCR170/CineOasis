@@ -42,7 +42,6 @@ class UserController extends Controller
                     'email' => 'required|email|unique:users,email',
                     'password' => 'required|alpha_dash',
                     'fechaNacimiento' => 'required|date',
-                    'permisoAdmin' => 'required|boolean',
                     'imagen'=>'string'
                 ];
                 $validator = validator($data, $rules);
@@ -53,7 +52,7 @@ class UserController extends Controller
                     $user->email = $data['email'];
                     $user->password = hash('sha256', $data['password']);
                     $user->fechaNacimiento = $data['fechaNacimiento'];
-                    $user->permisoAdmin = $data['permisoAdmin'];
+                    $user->permisoAdmin = false;
                     $user->imagen = $data['imagen'];
                     $user->save();
                     $response = [
