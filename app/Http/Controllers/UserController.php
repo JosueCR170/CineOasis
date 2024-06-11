@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
 use App\Helpers\JwtAuth;
+use App\Models\Ticket;
+use App\Models\DetalleTicket;
+use App\Models\ComboComida;
+
 
 class UserController extends Controller
 {
