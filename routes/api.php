@@ -12,6 +12,7 @@ use App\Http\Controllers\DetallesComboController;
 use App\Http\Controllers\FuncionAsientoController;
 
 
+
 use App\Http\Middleware\ApiAuthMiddleware;
 
 // Route::get('/user', function (Request $request) {
@@ -21,11 +22,12 @@ use App\Http\Middleware\ApiAuthMiddleware;
 Route::prefix('v1')->group(
     function(){
         //RUTAS ESPECIFICAS
+       
 
         //RUTAS IMAGEN GENERALES
         Route::get('/imagen/show/{path}/{filename}',[ImagenController::class,'show'])->middleware(ApiAuthMiddleware::class);
         Route::post('/imagen/store/{path}',[ImagenController::class,'store'])->middleware(ApiAuthMiddleware::class);
-        Route::put('/imagen/update/{path}/{filename}',[ImagenController::class,'update'])->middleware(ApiAuthMiddleware::class);
+        Route::post('/imagen/update/{path}/{filename}',[ImagenController::class,'update'])->middleware(ApiAuthMiddleware::class);
         Route::delete('/imagen/delete/{path}/{filename}',[ImagenController::class,'destroy'])->middleware(ApiAuthMiddleware::class);
 
         //RUTAS IMAGEN PARA PELICULA

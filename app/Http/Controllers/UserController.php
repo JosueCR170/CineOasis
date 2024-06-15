@@ -144,6 +144,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id) { 
         $user = User::find($id);
+        $jwt=new JwtAuth();
         if (!$user) {
             $response = [
                 'status' => 404,
@@ -166,8 +167,7 @@ class UserController extends Controller
         $rules = [
             'name'=>'alpha|max:30',
             'apellido'=>'alpha|max:40',
-            'email'=>'email|unique:users,email',
-            'password'=>'alpha_dash',
+            
             'fechaNacimiento'=>'date',
             'permisoAdmin'=>'boolean',
             'imagen'=>'string'
@@ -186,17 +186,20 @@ class UserController extends Controller
     
         if(isset($data_input['name'])) { $user->name = $data_input['name']; }
         if(isset($data_input['apellido'])) { $user->apellido = $data_input['apellido']; }
-        if(isset($data_input['email'])) { $user->email = $data_input['email']; }
-        if(isset($data_input['password'])) { $user->password = hash('sha256', $data_input['password']); }
+       
         if(isset($data_input['fechaNacimiento'])) { $user->fechaNacimiento = $data_input['fechaNacimiento']; }
         if(isset($data_input['permisoAdmin'])) { $user->permisoAdmin = $data_input['permisoAdmin']; }
         if(isset($data_input['imagen'])) { $user->imagen = $data_input['imagen']; }
 
         $user->save();
+       
+       $token= $jwt->refreshToken($user);
+
     
         $response = [
             'status' => 201,
             'message' => 'Usuario actualizado',
+            'token'=>$token,
             'user' => $user
         ];
     

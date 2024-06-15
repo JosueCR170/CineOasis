@@ -57,4 +57,28 @@ class JwtAuth{
         }
         return $authFlag;
     }
+
+
+    public function refreshToken($user){
+        if(is_object($user)){
+            $token=array(
+                'iss'=>$user->id,
+                'email'=>$user->email,
+                'name'=>$user->name,
+                'apellido'=>$user->apellido,
+                'fechaNacimiento'=>$user->fechaNacimiento,
+                'permisoAdmin'=>$user->permisoAdmin,
+                'imagen'=>$user->imagen,
+                'iat'=>time(),
+                'exp'=>time()+(10000)
+            );
+            $data=JWT::encode($token,$this->key,'HS256');
+        }else{
+            $data=array(
+                'status'=>401,
+                'message'=>'Datos de autenticación incorrectos'
+            );
+        }
+        return $data;
+    }
 }

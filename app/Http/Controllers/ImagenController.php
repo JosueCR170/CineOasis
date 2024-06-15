@@ -48,6 +48,7 @@ class ImagenController extends Controller
             $response=array(
                 'status'=>406,
                 'message'=>'Error: no se encontró el archivo',
+                'request'=>$request,
                 'errors'=>$isValid->errors(),
             );
         }
