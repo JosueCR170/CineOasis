@@ -36,7 +36,7 @@ class ComidaController extends Controller
             $rules=[
                 'nombre'=>'required|max:40|string',
                 'precio'=>'required|decimal:0,4',
-                'comida'=>'required|string'
+                'imagen'=>'required|string'
             ];
             $isValid=\validator($data,$rules);
             if(!$isValid->fails()){
