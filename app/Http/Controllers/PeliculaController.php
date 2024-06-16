@@ -108,7 +108,7 @@ class PeliculaController extends Controller
                 $response=array(
                 'status'=>200,
                 'menssage'=>'pelicula encontrada',
-                'category'=>$data
+                'pelicula'=>$data
                 );
             }
             else{
