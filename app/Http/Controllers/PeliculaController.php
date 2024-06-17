@@ -52,7 +52,7 @@ class PeliculaController extends Controller
             $rules = [
                 'nombre' => 'required|string|max:40',
                 'descripcion' => 'required',
-                'duracion' => 'required|date_format:H:i:s',
+                'duracion' => 'required|date_format:H:i',
                 'idioma' => ['required', Rule::in($idiomas)],
                 'subtitulo' => ['required', Rule::in($subtitulos)],
                 'genero' => 'required|max:20',
@@ -234,9 +234,11 @@ class PeliculaController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
+
     
         if(isset($data_input['nombre'])) { $pelicula->nombre = $data_input['nombre']; }
         if(isset($data_input['descripcion'])) { $pelicula->descripcion = $data_input['descripcion']; }
+        if(isset($data_input['duracion'])) { $pelicula->duracion = $data_input['duracion']; }
         if(isset($data_input['idioma'])) { $pelicula->idioma = $data_input['idioma']; }
         if(isset($data_input['subtitulo'])) { $pelicula->subtitulo = $data_input['subtitulo']; }
         if(isset($data_input['genero'])) { $pelicula->genero = $data_input['genero']; }

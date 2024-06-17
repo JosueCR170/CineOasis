@@ -36,7 +36,7 @@ Route::prefix('v1')->group(
         Route::get('/imagen/pelicula/{nombre}', [ImagenController::class, 'showImageForPelicula']);
         Route::post('/imagen/pelicula',[ImagenController::class,'storeImageForPelicula'])->middleware(ApiAuthMiddleware::class);
         Route::delete('/imagen/pelicula/{id}',[ImagenController::class,'destroyImagePelicula'])->middleware(ApiAuthMiddleware::class);
-        Route::put('/imagen/pelicula/{id}', [ImagenController::class, 'updateImageForPelicula'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::post('/imagen/pelicula/{id}', [ImagenController::class, 'updateImageForPelicula'])->middleware(ApiAuthMiddleware::class);//listo
        
         //POST
         Route::post('/user/login',[UserController::class,'login']);//listo

@@ -41,8 +41,8 @@ class FuncionController extends Controller
                 'idPelicula'=>'required|exists:peliculas,id',
                 'sala' => ['required', Rule::in($salas)],
                 'fecha'=>'required|date',
-                'horaInicio'=>'required|date_format:H:i:s',
-                'horaFinal'=>'required|date_format:H:i:s',
+                'horaInicio'=>'required|date_format:H:i',
+                'horaFinal'=>'required|date_format:H:i',
                 'precio'=>'required|decimal:0,4'
             ];
             $isValid=\validator($data,$rules);
@@ -163,8 +163,8 @@ class FuncionController extends Controller
             'idPelicula'=>'exists:peliculas,id',
             'sala' => Rule::in($salas),
             'fecha'=>'date',
-            'horaInicio'=>'date_format:H:i:s',
-            'horaFinal'=>'date_format:H:i:s',
+            'horaInicio'=>'date_format:H:i',
+            'horaFinal'=>'date_format:H:i',
             'precio'=>'decimal:0,4'
         ];
     

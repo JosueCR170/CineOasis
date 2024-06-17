@@ -105,6 +105,7 @@ class ImagenController extends Controller
     public function index()
     {
         $data = Imagen::all();
+        $data=$data->load('peliculas');
         $response = array(
             "status" => 200,
             "message" => "Todos los registros de las imagenes",
@@ -213,7 +214,7 @@ class ImagenController extends Controller
         $data_input = $request->input('data', null);
         $file = $request->file('file');
 
-        if (!$data_input && !$file) {
+        if (!$data_input || !$file) {
             $response = [
                 'status' => 400,
                 'message' => 'No se proporcionaron datos ni archivo para actualizar'
@@ -224,7 +225,7 @@ class ImagenController extends Controller
             $data = json_decode($data_input, true);
             $data = array_map('trim', $data);
             $isValid = \Validator::make($data, [
-                'idPelicula' => 'exists:peliculas,id'
+                'descripcion' => 'string'
             ]);
             if ($isValid->fails()) {
                 $response = [
@@ -234,7 +235,6 @@ class ImagenController extends Controller
                 ];
                 return response()->json($response, $response['status']);
             }
-            $imagen->idPelicula = isset($data['idPelicula']) ? $data['idPelicula'] : $imagen->idPelicula;
             $imagen->descripcion = isset($data['descripcion']) ? $data['descripcion'] : $imagen->descripcion;
         }
 
@@ -255,16 +255,6 @@ class ImagenController extends Controller
 
     public function destroyImagePelicula(Request $request, $id)
     {
-
-        $jwt = new JwtAuth();
-        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
-            $response = array(
-                'status' => 406,
-                'menssage' => 'No tienes permiso de administrador'
-
-            );
-           
-        } else {
 
         if (isset($id)) {
             $imagen = Imagen::find($id);
@@ -289,7 +279,7 @@ class ImagenController extends Controller
                 'menssage' => 'Falta el identificador del recurso a eliminar'
             );
         }
-    }
+    
         return response()->json($response, $response['status']);
     }
 }
