@@ -251,4 +251,45 @@ class ImagenController extends Controller
     }
         return response()->json($response, $response['status']);
     }
+
+
+    public function destroyImagePelicula(Request $request, $id)
+    {
+
+        $jwt = new JwtAuth();
+        if (!$jwt->checkToken($request->header('bearertoken'), true)->permisoAdmin) {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'No tienes permiso de administrador'
+
+            );
+           
+        } else {
+
+        if (isset($id)) {
+            $imagen = Imagen::find($id);
+            $delete = Imagen::where('id', $id)->delete();
+            if ($delete) {
+
+                $filename = $imagen->imagen;
+                \Storage::disk('peliculas')->delete($filename);
+                $response = array(
+                    'status' => 200,
+                    'menssage' => 'Imagen eliminada',
+                );
+            } else {
+                $response = array(
+                    'status' => 400,
+                    'menssage' => 'No se pudo eliminar la Imagen, compruebe que exista'
+                );
+            }
+        } else {
+            $response = array(
+                'status' => 406,
+                'menssage' => 'Falta el identificador del recurso a eliminar'
+            );
+        }
+    }
+        return response()->json($response, $response['status']);
+    }
 }
