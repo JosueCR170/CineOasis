@@ -147,7 +147,7 @@ class ImagenController extends Controller
 
             $data_input = $request->input('data', null);
             $file = $request->file('file');
-
+            //var_dump($file);
             if ($data_input && $file) {
                 $data = json_decode($data_input, true);
                 $data = array_map('trim', $data);
