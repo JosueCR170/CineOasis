@@ -26,6 +26,7 @@ Route::prefix('v1')->group(
 
         //RUTAS IMAGEN GENERALES
         Route::get('/imagen/show/{path}/{filename}',[ImagenController::class,'show'])->middleware(ApiAuthMiddleware::class);
+        Route::get('/imagen/search/{path}/{filename}',[ImagenController::class,'show']);
         Route::post('/imagen/store/{path}',[ImagenController::class,'store'])->middleware(ApiAuthMiddleware::class);
         Route::post('/imagen/update/{path}/{filename}',[ImagenController::class,'update'])->middleware(ApiAuthMiddleware::class);
         Route::delete('/imagen/delete/{path}/{filename}',[ImagenController::class,'destroy'])->middleware(ApiAuthMiddleware::class);
