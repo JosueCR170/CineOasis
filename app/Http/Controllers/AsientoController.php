@@ -123,7 +123,7 @@ class AsientoController extends Controller
             $response=array(
                 'status'=>200,
                 'message'=>'Datos del asiento',
-                'asiento$asiento'=>$data
+                'asiento'=>$data
             );
         }else{
             $response=array(

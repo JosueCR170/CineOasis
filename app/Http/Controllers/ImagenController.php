@@ -214,7 +214,7 @@ class ImagenController extends Controller
         $data_input = $request->input('data', null);
         $file = $request->file('file');
 
-        if (!$data_input || !$file) {
+        if (!$data_input && !$file) {
             $response = [
                 'status' => 400,
                 'message' => 'No se proporcionaron datos ni archivo para actualizar'
