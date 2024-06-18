@@ -160,12 +160,10 @@ class FuncionController extends Controller
         }
         $salas = Funcion::getSalas();
         $rules = [
-            'idPelicula'=>'exists:peliculas,id',
             'sala' => Rule::in($salas),
             'fecha'=>'date',
-            'horaInicio'=>'date_format:H:i',
-            'horaFinal'=>'date_format:H:i',
-            'precio'=>'decimal:0,4'
+            'horaInicio'=>'date_format:H:i:s',
+            'horaFinal'=>'date_format:H:i:s',
         ];
     
         $validator = \validator($data_input, $rules);
@@ -179,13 +177,10 @@ class FuncionController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        if(isset($data_input['idPelicula'])) { $funcion->idPelicula = $data_input['idPelicula']; }
         if(isset($data_input['sala'])) { $funcion->sala = $data_input['sala']; }
-
         if(isset($data_input['fecha'])) { $funcion->fecha = $data_input['fecha']; }
         if(isset($data_input['horaInicio'])) { $funcion->horaInicio = $data_input['horaInicio']; }
         if(isset($data_input['horaFinal'])) { $funcion->horaFinal = $data_input['horaFinal']; }
-        if(isset($data_input['precio'])) { $funcion->precio = $data_input['precio']; }
 
         $funcion->save();
     
