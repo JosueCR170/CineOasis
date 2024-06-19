@@ -70,7 +70,7 @@ class JwtAuth{
                 'permisoAdmin'=>$user->permisoAdmin,
                 'imagen'=>$user->imagen,
                 'iat'=>time(),
-                'exp'=>time()+(10000)
+                'exp'=>time()+(600)
             );
             $data=JWT::encode($token,$this->key,'HS256');
         }else{
