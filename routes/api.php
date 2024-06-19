@@ -47,7 +47,9 @@ Route::prefix('v1')->group(
         Route::post('/comida',[ComidaController::class,'store'])->middleware(ApiAuthMiddleware::class);
         Route::post('/funcion',[FuncionController::class,'store'])->middleware(ApiAuthMiddleware::class);
         //show
-        Route::get('/user/getIdentity',[UserController::class,'getIdentity'])->middleware(ApiAuthMiddleware::class);//listo
+        Route::get('/user/verifyToken',[UserController::class,'verifyToken']);
+
+        Route::get('/user/getIdentity',[UserController::class,'getIdentity'])->middleware(ApiAuthMiddleware::class);
         Route::get('/comida/{id}', [ComidaController::class, 'show']);
         Route::get('/asiento/{id}', [AsientoController::class, 'show']);
         Route::get('/funcion/{id}', [FuncionController::class, 'show']);

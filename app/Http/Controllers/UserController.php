@@ -252,4 +252,19 @@ class UserController extends Controller
         }
         return response()->json($response);
     }
+
+    public function verifyToken(Request $request)
+    {
+        $jwt=new JwtAuth();
+        $token=$request->header('bearertoken');
+        if(isset($token)){
+            $response=$jwt->checkToken($token,false);
+        }else{
+            $response=array(
+                'status'=>404,
+                'message'=>'token caducado'
+            );
+        }
+        return response()->json($response);
+    }
 }
